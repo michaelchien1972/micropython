@@ -313,6 +313,12 @@ typedef enum {
 
 }rtw_country_code_t;
 
+typedef enum {
+	RTW_ADAPTIVITY_DISABLE = 0,
+	RTW_ADAPTIVITY_NORMAL,			// CE
+	RTW_ADAPTIVITY_CARRIER_SENSE	// MKK
+} rtw_adaptivity_mode_t;
+
 
 typedef enum {
 	RTW_MODE_NONE = 0,
@@ -417,6 +423,7 @@ typedef enum _WIFI_EVENT_INDICATE{
 	WIFI_EVENT_EAPOL_RECVD = 11,
 	WIFI_EVENT_NO_NETWORK = 12,
 	WIFI_EVENT_BEACON_AFTER_DHCP = 13,
+	WIFI_EVENT_DHCP_ASSIGNED = 14,
 	WIFI_EVENT_MAX,
 }WIFI_EVENT_INDICATE;
 #ifdef	__cplusplus

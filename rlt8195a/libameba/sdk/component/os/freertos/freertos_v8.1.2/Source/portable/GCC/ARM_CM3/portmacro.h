@@ -71,8 +71,6 @@
 extern "C" {
 #endif
 
-#include "rtl8195a.h"
-
 /*-----------------------------------------------------------
  * Port specific definitions.
  *

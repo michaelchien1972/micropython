@@ -82,17 +82,13 @@ typedef unsigned int            BOOL;
 typedef unsigned char           BOOL;
 #endif
 #ifndef bool
-#ifndef __cplusplus
 typedef unsigned char           bool;
-#endif
 #endif
 #endif
 
 #define UCHAR                   uint8_t
 #define USHORT                  uint16_t
-#if 0
 #define UINT                    uint32_t
-#endif
 #define ULONG                   uint32_t	
 
 typedef struct { volatile int counter; } atomic_t;
@@ -199,7 +195,6 @@ typedef	    __kernel_ssize_t	SSIZE_T;
 #define ALIGNMTO(_bound) __attribute__ ((aligned (_bound)))
 #define _PACKED_       __attribute__ ((packed))
 #define _LONG_CALL_     __attribute__ ((long_call))
-#define _LONG_CALL_ROM_     _LONG_CALL_
 #define _WEAK           __attribute__ ((weak))
 #endif
 

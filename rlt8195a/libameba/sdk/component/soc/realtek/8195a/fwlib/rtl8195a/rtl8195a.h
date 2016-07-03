@@ -96,10 +96,10 @@
 #include "rtl8195a_dac.h"
 #endif
 
-#ifdef CONFIG_ADC_EN
+
 #include "hal_adc.h"
 #include "rtl8195a_adc.h"
-#endif
+
 
 #ifdef CONFIG_SDR_EN
 #endif
@@ -125,7 +125,6 @@
 #include "rtl8195a_usb.h"
 #endif
 
-#include "hal_log_uart.h"
 
 // firmware information, located at the header of Image2
 #define FW_VERSION          (0x0100)
