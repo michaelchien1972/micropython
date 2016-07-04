@@ -11,8 +11,9 @@
 #include "hal_sdio.h"
 #include "mailbox.h"
 
-#if CONFIG_INIC_EN
+//(Chester added) fix compile error
 #include "freertos_pmu.h"
+#if CONFIG_INIC_EN
 extern struct sk_buff *rltk_wlan_alloc_skb(unsigned int total_len);
 extern unsigned char *skb_put(struct sk_buff * skb, unsigned int len);
 extern void inic_sdio_free_data(unsigned char *data);

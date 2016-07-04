@@ -88,7 +88,10 @@ typedef unsigned char           bool;
 
 #define UCHAR                   uint8_t
 #define USHORT                  uint16_t
-#define UINT                    uint32_t
+
+// (Chester added) fix compile error
+//#define UINT                    uint32_t
+
 #define ULONG                   uint32_t	
 
 typedef struct { volatile int counter; } atomic_t;
@@ -195,6 +198,10 @@ typedef	    __kernel_ssize_t	SSIZE_T;
 #define ALIGNMTO(_bound) __attribute__ ((aligned (_bound)))
 #define _PACKED_       __attribute__ ((packed))
 #define _LONG_CALL_     __attribute__ ((long_call))
+
+//(Chester added): fix compiler error
+#define _LONG_CALL_ROM_
+
 #define _WEAK           __attribute__ ((weak))
 #endif
 

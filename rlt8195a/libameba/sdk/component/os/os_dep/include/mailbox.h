@@ -42,7 +42,9 @@ typedef enum _MAILBOX_ID_ {
 	MBOX_ID_MAX =	0xff	
 } MAILBOX_ID;
 
-#if defined(CONFIG_SDIO_DEVICE_EN) && defined(CONFIG_SDIO_DEVICE_NORMAL)
+// (Chesteradded) : fix compile error
+//#if defined(CONFIG_SDIO_DEVICE_EN) && defined(CONFIG_SDIO_DEVICE_NORMAL)
+#if 1
 typedef enum _MSG_TYPE_SDIO {
 	MSG_SDIO_RX_PKT=1,		// request to send a SDIO RX packet to the host side
 	MSG_SDIO_C2H=2,			// request to send a C2H message

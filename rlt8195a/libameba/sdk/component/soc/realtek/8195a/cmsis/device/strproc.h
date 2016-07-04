@@ -11,7 +11,8 @@
 #define _STRPROC_H_
 
 #include <stddef.h> /* for size_t */
-#include "va_list.h"
+//(Chester added) fix compile error
+#include <stdarg.h>
 
 #ifndef isprint
 #define in_range(c, lo, up)  ((u8)c >= lo && (u8)c <= up)

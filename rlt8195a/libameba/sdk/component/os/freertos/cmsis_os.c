@@ -2,6 +2,10 @@
 
 #include "cmsis_os.h"
 #include "diag.h"
+#include "rtl8195a.h"
+#include "hal_irqn.h"
+#include "core_cm3.h"
+#include "core_cmFunc.h"
 
 #define CMSIS_OS_ERR(...)          do { DBG_8195A("\n\r%s: ", __FUNCTION__); DBG_8195A(__VA_ARGS__); } while(0)
 

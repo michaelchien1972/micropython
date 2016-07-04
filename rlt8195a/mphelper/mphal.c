@@ -23,39 +23,53 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include "py/mpstate.h"
-#include "py/runtime.h"
-#include "py/mphal.h"
-#include "py/mpstate.h"
+// Standard header
+#include <stdio.h>
+
+// Micropython header
 #include "extmod/misc.h"
-#include "lib/utils/pyexec.h"
-#include "py/obj.h"
 #include "py/ringbuf.h"
 
-#include <stdio.h>
+// SDK header
 #include "osdep_api.h"
 #include "device.h"
-#include "log_uart_api.h"
 
-static log_uart_t log_uart_obj;
 STATIC uint8_t input_buf_array[256];
+
 ringbuf_t input_buf = {input_buf_array, sizeof(input_buf_array)};
+
 int interrupt_char;
 
-void log_uart_irq_service(void *arg) {
-    int c = log_uart_getc(&log_uart_obj);
+MON_RAM_TEXT_SECTION
+void UartLogIrqHandleRam(void *arg) {
+    uint8_t c = -1;
+    bool PullMode = _FALSE;
+    uint32_t IrqEn = DiagGetIsrEnReg();
+
+    DiagSetIsrEnReg(0);
+
+    c = DiagGetChar(PullMode);
+
     if (c == interrupt_char) {
         mp_keyboard_interrupt();
     } else {
         ringbuf_put(&input_buf, c);
     }
+
+    DiagSetIsrEnReg(IrqEn);
 }
 
 void log_uart_init0(void)
 {
-    log_uart_init(&log_uart_obj, 38400, 8, ParityNone, 1);
-    log_uart_irq_handler(&log_uart_obj, log_uart_irq_service, 1);
-    log_uart_irq_set(&log_uart_obj, IIR_RX_RDY, true);
+    IRQ_HANDLE      UartIrqHandle;
+    
+    UartIrqHandle.Data     = NULL;
+    UartIrqHandle.IrqNum   = UART_LOG_IRQ;
+    UartIrqHandle.IrqFun   = UartLogIrqHandleRam;
+    UartIrqHandle.Priority = 0;
+    
+    InterruptUnRegister(&UartIrqHandle);
+    InterruptRegister(&UartIrqHandle);
 }
 
 int mp_hal_stdin_rx_chr(void) {
@@ -69,8 +83,7 @@ int mp_hal_stdin_rx_chr(void) {
 }
 
 void mp_hal_stdout_tx_char(char c) {
-    //uart_tx_one_char(UART0, c);
-    log_uart_putc(&log_uart_obj, c);
+    DiagPutChar(c);
     mp_uos_dupterm_tx_strn(&c, 1);
 }
 
@@ -96,7 +109,7 @@ void mp_hal_stdout_tx_strn_cooked(const char *str, size_t len) {
 }
 
 void mp_hal_set_interrupt_char(int c) {
-    mpexception_set_interrupt_char (c);
+    mpexception_set_interrupt_char(c);
 }
 
 void mp_hal_delay_ms(uint32_t ms) {
@@ -111,5 +124,3 @@ uint32_t mp_hal_ticks_ms(void) {
     // TODO
     return 0;
 }
-
-

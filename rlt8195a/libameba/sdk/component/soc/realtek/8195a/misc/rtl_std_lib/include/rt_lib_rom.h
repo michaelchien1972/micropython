@@ -13,8 +13,10 @@
 
 #include <reent.h>
 
+#if 0 //(Chester added) fix compile error
 #include "../libc/rom/string/rom_libc_string.h"
 #include "../libgloss/rtl8195a/rom/rom_libgloss_retarget.h"
+#endif
 
 #ifndef _PTR
 #define	_PTR		void *

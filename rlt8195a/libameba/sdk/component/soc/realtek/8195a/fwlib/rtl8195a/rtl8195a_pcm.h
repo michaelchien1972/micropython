@@ -13,6 +13,8 @@
 
 #include "basic_types.h"
 #include "hal_api.h"
+// (Chester added) fix compile error
+#include "hal_platform.h"
 
 #define HAL_PCMX_READ32(PcmIndex, addr)     \
                 HAL_READ32(PCM0_REG_BASE+ (PcmIndex*PCM1_REG_OFF), addr)

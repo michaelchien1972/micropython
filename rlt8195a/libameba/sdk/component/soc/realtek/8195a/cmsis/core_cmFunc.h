@@ -89,6 +89,7 @@ __STATIC_INLINE void __set_CONTROL(uint32_t control)
  */
 __STATIC_INLINE uint32_t __get_IPSR(void)
 {
+    dsfd
   register uint32_t __regIPSR          __ASM("ipsr");
   return(__regIPSR);
 }
@@ -330,7 +331,6 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __enable_irq(void)
 {
   __ASM volatile ("cpsie i" : : : "memory");
 }
-
 
 /** \brief  Disable IRQ Interrupts
 

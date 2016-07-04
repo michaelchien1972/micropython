@@ -43,7 +43,9 @@ STATIC mp_obj_t adc_read(mp_obj_t self_in) {
     adc_obj_t *self = self_in;
     float readFloat = analogin_read((analogin_t *)self->obj);
     uint16_t readInt = analogin_read_u16((analogin_t *)self->obj);
+#if MICROPY_PY_BUILTINS_FLOAT
     tuple[0] = mp_obj_new_float(readFloat);
+#endif
     tuple[1] = mp_obj_new_int(readInt);
     return mp_obj_new_tuple(2, tuple);
 }

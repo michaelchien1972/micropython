@@ -23,6 +23,7 @@ BOARD ?= ameba
 
 INC += -I.
 INC += -I..
+INC += -Iconfigs
 INC += -I$(BUILD)
 INC += -I$(HELPER)
 
@@ -86,6 +87,8 @@ INC += -I$(HELPER)/mods/hardware
 
 INC += -I../stmhal
 
+INC += -I$(SDK)/component/os/os_dep/include
+
 #-------------------------------------------------------------------------------
 # Flags
 #-------------------------------------------------------------------------------
@@ -142,13 +145,12 @@ ELF_LDFLAGS += -Wl,--no-wchar-size-warning
 ELF_LDFLAGS += -Wl,--entry=InfraStart
 ELF_LDFLAGS += -Wl,-nostdlib
 
-ELF_ARLIST += ./$(LIB)/lib_wlan.a
-ELF_ARLIST += ./$(LIB)/lib_wlan_mp.a 
-ELF_ARLIST += ./$(LIB)/lib_wps.a
-ELF_ARLIST += ./$(LIB)/lib_mdns.a
-ELF_ARLIST += ./$(LIB)/lib_ameba.a
-ELF_ARLIST += ./$(LIB)/lib_rtlstd.a
-ELF_ARLIST += ./$(LIB)/lib_platform.a
+ELF_ARLIST += ./libameba//sdk/component/soc/realtek/8195a/misc/bsp/lib/common/IAR/lib_mdns.a
+ELF_ARLIST += ./libameba//sdk/component/soc/realtek/8195a/misc/bsp/lib/common/IAR/lib_wps.a
+ELF_ARLIST += ./libameba//sdk/component/soc/realtek/8195a/misc/bsp/lib/common/IAR/lib_platform.a
+ELF_ARLIST += ./libameba//sdk/component/soc/realtek/8195a/misc/bsp/lib/common/IAR/lib_wlan.a
+ELF_ARLIST += ./libameba//sdk/component/soc/realtek/8195a/misc/bsp/lib/common/IAR/lib_wlan_mp.a
+ELF_ARLIST += ./libameba//sdk/component/soc/realtek/8195a/misc/bsp/lib/common/IAR/lib_rtlstd.a
 
 #-------------------------------------------------------------------------------
 # C source files and objects
@@ -160,6 +162,35 @@ SRC_C += $(wildcard $(HELPER)/mods/*.c)
 SRC_C += $(wildcard $(HELPER)/mods/hardware/*.c)
 SRC_C += $(wildcard $(HELPER)/mods/wireless/*.c)
 SRC_C += $(wildcard $(HELPER)/mods/network/*.c)
+
+# new added
+SRC_C += $(wildcard libameba/sdk/component/os/os_dep/*.c)
+SRC_C += $(wildcard libameba/sdk/component/common/mbed/targets/hal/rtl8195a/*.c)
+SRC_C += $(wildcard libameba/sdk/component/soc/realtek/8195a/fwlib/rtl8195a/src/*.c)
+SRC_C += $(wildcard libameba/sdk/component/common/drivers/wlan/realtek/src/osdep/*.c)
+SRC_C += $(wildcard libameba/sdk/component/os/freertos/*.c)
+
+SRC_C += $(wildcard libameba/sdk/component/common/network/lwip/lwip_v1.4.1/src/api/*.c)
+SRC_C += $(wildcard libameba/sdk/component/common/network/lwip/lwip_v1.4.1/src/core/ipv4/*.c)
+SRC_C += $(wildcard libameba/sdk/component/common/network/lwip/lwip_v1.4.1/src/netif/*.c)
+
+SRC_C += $(wildcard libameba/sdk/component/common/network/lwip/lwip_v1.4.1/port/realtek/freertos/*.c)
+
+SRC_C += $(wildcard libameba/sdk/component/os/freertos/freertos_v8.1.2/Source/*.c)
+SRC_C += $(wildcard libameba/sdk/component/os/freertos/freertos_v8.1.2/Source/portable/GCC/ARM_CM3/*.c)
+SRC_C += $(wildcard libameba/sdk/component/os/freertos/freertos_v8.1.2/Source/portable/MemMang/heap_4.c)
+SRC_C += $(wildcard libameba/sdk/component/common/network/lwip/lwip_v1.4.1/src/core/*.c)
+SRC_C += $(wildcard libameba/sdk/component/soc/realtek/8195a/fwlib/src/*.c)
+SRC_C += $(wildcard libameba/sdk/component/common/api/wifi/*.c)
+SRC_C += $(wildcard libameba/sdk/component/common/api/*.c)
+SRC_C += $(wildcard libameba/sdk/component/common/network/dhcp/*.c)
+SRC_C += $(wildcard libameba/sdk/component/soc/realtek/8195a/cmsis/device/*c)
+SRC_C += $(wildcard libameba/sdk/component/common/example/wlan_fast_connect/*.c)
+SRC_C += $(wildcard libameba/sdk/component/common/api/at_cmd/*.c)
+#SRC_C += $(wildcard libameba/sdk/component/common/api/wifi/rtw_wpa_supplicant/wpa_supplicant/*.c)
+SRC_C += $(wildcard libameba/sdk/component/common/api/network/src/*.c)
+SRC_C += $(wildcard libameba/sdk/component/common/utilities/ping_test.c)
+SRC_C += $(wildcard libameba/sdk/component/common/utilities/update.c)
 
 #-------------------------------------------------------------------------------
 # External C source files and objects
@@ -247,7 +278,8 @@ image: $(BUILD)/firmware.map
 	$(Q)$(TOOLS)/mac/pick $(RAM2_START_ADDR) $(RAM2_END_ADDR) $(BUILD)/ram_2.bin $(BUILD)/ram_2.p.bin body+reset_offset+sig
 	$(Q)$(TOOLS)/mac/pick $(RAM2_START_ADDR) $(RAM2_END_ADDR) $(BUILD)/ram_2.bin $(BUILD)/ram_2.ns.bin body+reset_offset
 	$(Q)$(TOOLS)/mac/pick $(RAM3_START_ADDR) $(RAM3_END_ADDR) $(BUILD)/sdram.bin $(BUILD)/ram_3.p.bin body+reset_offset
-	$(Q)$(CP) $(TOOLS)/ram_1.p.bin $(BUILD)/ram_1.p.bin
+	#$(Q)$(CP) $(TOOLS)/ram_1.p.bin $(BUILD)/ram_1.p.bin
+	$(Q)$(CP) libameba/sdk/component/soc/realtek/8195a/misc/bsp/image/ram_1.p.bin $(BUILD)/ram_1.p.bin
 	$(Q)$(TOOLS)/mac/padding 44k 0xFF $(BUILD)/ram_1.p.bin
 	$(Q)cat $(BUILD)/ram_1.p.bin $(BUILD)/ram_2.p.bin $(BUILD)/ram_3.p.bin > $(BUILD)/ram_all.bin
 	$(Q)cat $(BUILD)/ram_2.ns.bin $(BUILD)/ram_3.p.bin > $(BUILD)/ota.bin
