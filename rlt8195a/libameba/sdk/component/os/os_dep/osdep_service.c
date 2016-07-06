@@ -824,6 +824,7 @@ void rtw_yield_os(void)
 		OSDEP_DBG("Not implement osdep service: rtw_yield_os");
 }
 
+#if 0 //TODO(Chester) We use Arduino Ameba SDK's lib_wlan.a and face function conflict , so we remove them here
 void rtw_init_timer(_timer *ptimer, void *adapter, TIMER_FUN pfunc,void* cntx, const char *name)
 {
 	if(osdep_service.rtw_init_timer)
@@ -857,6 +858,7 @@ void rtw_del_timer(_timer *ptimer)
 	else
 		OSDEP_DBG("Not implement osdep service: rtw_del_timer");
 }
+#endif
 
 void ATOMIC_SET(ATOMIC_T *v, int i)
 {

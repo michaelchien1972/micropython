@@ -2,33 +2,34 @@
 
 ENTRY(Reset_Handler)
 
-INCLUDE "export-rom_v03.txt"
-
 __stack_size__    = 512K;       /* interrupts are handled within this stack */
 __min_heap_size__ = 128K;
 
 MEMORY
 {
-  TCM (rwx) : ORIGIN = 0x1FFF0000, LENGTH = 65536
-  ROM_USED_RAM (rwx)  : ORIGIN = 0x10000000, LENGTH = 0x5FFF
-  BD_RAM (rwx)  : ORIGIN = 0x10006000, LENGTH = 434176
+  ROM (rx) : ORIGIN = 0x00000000, LENGTH = 0x100000
+  TCM (rwx) : ORIGIN = 0x1FFF0000, LENGTH = 0x10000
+  ROM_USED_RAM (rwx)  : ORIGIN = 0x10000000, LENGTH = 0x6000
+  BD_RAM (rwx)  : ORIGIN = 0x10006000, LENGTH = 0x6A000
   SDRAM_RAM (rwx)  : ORIGIN = 0x30000000, LENGTH = 2M
 }
-
-
 
 SECTIONS
 {
   __rom_bss_start__ = 0x10000300;
   __rom_bss_end__ = 0x10000bc8;
+  __ram_start_table_start__ = 0x10000bc8;
+  __image1_validate_code__ = 0x10000bdc;
+  _rtl_impure_ptr = 0x10001c60;
+
+  .rom : 
+  {
+      KEEP(*(.rom*))
+  } > ROM
 
   .ram.start.table :
   {
-    __ram_image1_text_start__ = .;
-    __ram_start_table_start__ = .;
     KEEP(*(SORT(.start.ram.data*)))
-    __ram_start_table_end__ = .;
-    
   } > ROM_USED_RAM
 
 

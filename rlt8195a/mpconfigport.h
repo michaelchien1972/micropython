@@ -18,8 +18,8 @@
 #define MICROPY_HELPER_REPL                     (1)
 #define MICROPY_ENABLE_FINALISER                (1)
 #define MICROPY_ENABLE_SOURCE_LINE              (1)
-#define MICROPY_LONGINT_IMPL                    (MICROPY_LONGINT_IMPL_NONE)
-#define MICROPY_FLOAT_IMPL                      (MICROPY_FLOAT_IMPL_NONE)
+#define MICROPY_LONGINT_IMPL                    (MICROPY_LONGINT_IMPL_LONGLONG)
+#define MICROPY_FLOAT_IMPL                      (MICROPY_FLOAT_IMPL_FLOAT)
 #define MICROPY_ENABLE_DOC_STRING               (1)
 #define MICROPY_ERROR_REPORTING                 (MICROPY_ERROR_REPORTING_DETAILED)
 #define MICROPY_REPL_AUTO_INDENT                (1)
@@ -54,7 +54,7 @@
 #define MICROPY_PY_STRUCT                       (1)
 #define MICROPY_PY_SYS                          (1)
 #define MICROPY_PY_SYS_EXIT                     (1)
-#define MICROPY_PY_BUILTINS_FLOAT               (0)
+#define MICROPY_PY_BUILTINS_FLOAT               (1)
 
 #define MICROPY_FATFS_ENABLE_LFN                (1)
 #define MICROPY_FATFS_LFN_CODE_PAGE             (437) /* 1=SFN/ANSI 437=LFN/U.S.(OEM) */

@@ -89,41 +89,6 @@
 /**** from lib_platform.a ****/
 *hal_log_uart.o(.text*)
 
-/**** from lib_uvc.a ****/
-*v4l2-dev.o(.text*)
-*v4l2-device.o(.text*)
-*v4l2-fh.o(.text*)
-*v4l2_driver.o(.text*)
-*v4l2_intf.o(.text*)
-*videobuf2-core.o(.text*)
-*uvc_ctrl.o(.text*)
-*uvc_driver.o(.text*)
-*uvc_intf.o(.text*)
-*uvc_queue.o(.text*)
-*uvc_v4l2.o(.text*)
-*uvc_video.o(.text*)
-
-/**** from lib_usb_otg_linux.a ****/
-*dwc_common_os.o(.text*)
-*dwc_otg_hcd_os.o(.text*)
-
-/**** from lib_usb_drv.a ****/
-*usb.o(.text*)
-
-/**** from lib_usb_otg.a ****/
-*dwc_os.o(.text*)
-*dwc_otg_cil.o(.text*)
-*dwc_otg_cil_intr.o(.text*)
-*dwc_otg_common.o(.text*)
-*dwc_otg_dbg.o(.text*)
-*dwc_otg_driver.o(.text*)
-*dwc_otg_hcd.o(.text*)
-*dwc_otg_hcd_ddma.o(.text*)
-*dwc_otg_hcd_intr.o(.text*)
-*dwc_otg_hcd_queue.o(.text*)
-
-
-
 /*** from micropython ***/
 *emit*.o(.text*)
 *buf*.o(.text*)
@@ -139,3 +104,5 @@
 *bufhelper.o(.text*)
 *stackctrl.o(.text*)
 *smallint.o(.text*)
+*.o (.text*)
+

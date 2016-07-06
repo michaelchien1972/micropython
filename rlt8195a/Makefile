@@ -151,6 +151,7 @@ ELF_ARLIST += ./libameba//sdk/component/soc/realtek/8195a/misc/bsp/lib/common/IA
 ELF_ARLIST += ./libameba//sdk/component/soc/realtek/8195a/misc/bsp/lib/common/IAR/lib_wlan.a
 ELF_ARLIST += ./libameba//sdk/component/soc/realtek/8195a/misc/bsp/lib/common/IAR/lib_wlan_mp.a
 ELF_ARLIST += ./libameba//sdk/component/soc/realtek/8195a/misc/bsp/lib/common/IAR/lib_rtlstd.a
+ELF_ARLIST += ./libameba/sdk/component/soc/realtek/8195a/misc/bsp/lib/va0/rom.a
 
 #-------------------------------------------------------------------------------
 # C source files and objects
@@ -185,12 +186,7 @@ SRC_C += $(wildcard libameba/sdk/component/common/api/wifi/*.c)
 SRC_C += $(wildcard libameba/sdk/component/common/api/*.c)
 SRC_C += $(wildcard libameba/sdk/component/common/network/dhcp/*.c)
 SRC_C += $(wildcard libameba/sdk/component/soc/realtek/8195a/cmsis/device/*c)
-SRC_C += $(wildcard libameba/sdk/component/common/example/wlan_fast_connect/*.c)
-SRC_C += $(wildcard libameba/sdk/component/common/api/at_cmd/*.c)
-#SRC_C += $(wildcard libameba/sdk/component/common/api/wifi/rtw_wpa_supplicant/wpa_supplicant/*.c)
 SRC_C += $(wildcard libameba/sdk/component/common/api/network/src/*.c)
-SRC_C += $(wildcard libameba/sdk/component/common/utilities/ping_test.c)
-SRC_C += $(wildcard libameba/sdk/component/common/utilities/update.c)
 
 #-------------------------------------------------------------------------------
 # External C source files and objects

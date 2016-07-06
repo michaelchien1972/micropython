@@ -40,6 +40,54 @@ ringbuf_t input_buf = {input_buf_array, sizeof(input_buf_array)};
 
 int interrupt_char;
 
+typedef struct _UART_LOG_BUF_ {
+u8  BufCount;                           //record the input cmd char number.
+u8  UARTLogBuf[127];   //record the input command.
+} UART_LOG_BUF, *PUART_LOG_BUF;
+
+typedef struct _UART_LOG_CTL_ {
+        u8  NewIdx;
+        u8  SeeIdx;
+        u8  RevdNo;
+        u8  EscSTS;
+        u8  ExecuteCmd;
+        u8  ExecuteEsc;
+        u8  BootRdy;
+        u8  Resvd;
+        PUART_LOG_BUF   pTmpLogBuf;        
+        VOID *pfINPUT;
+        PCOMMAND_TABLE  pCmdTbl;
+        u32 CmdTblSz;
+#ifdef CONFIG_UART_LOG_HISTORY        
+        u32  CRSTS;
+#endif        
+#ifdef CONFIG_UART_LOG_HISTORY
+        u8  (*pHistoryBuf)[127];
+#endif
+#ifdef CONFIG_KERNEL
+		u32		TaskRdy;
+		_Sema	Sema;
+#else
+        // Since ROM code will reference this typedef, so keep the typedef same size
+        u32     TaskRdy;
+        void    *Sema;
+#endif
+} UART_LOG_CTL, *PUART_LOG_CTL;
+
+MON_RAM_BSS_SECTION 
+    volatile UART_LOG_CTL    UartLogCtl;
+MON_RAM_BSS_SECTION 
+    volatile UART_LOG_CTL    *pUartLogCtl;
+MON_RAM_BSS_SECTION 
+    u8                       *ArgvArray[10];
+MON_RAM_BSS_SECTION 
+    UART_LOG_BUF             UartLogBuf;
+
+#ifdef CONFIG_UART_LOG_HISTORY
+MON_RAM_BSS_SECTION
+    u8  UartLogHistoryBuf[5][127];
+#endif
+
 MON_RAM_TEXT_SECTION
 void UartLogIrqHandleRam(void *arg) {
     uint8_t c = -1;

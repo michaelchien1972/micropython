@@ -7,7 +7,7 @@
  * Target Platform Selection
  */
 #define CONFIG_WITHOUT_MONITOR 1
-#define CONFIG_BOOT_TO_UPGRADE_IMG2 1
+#define CONFIG_BOOT_TO_UPGRADE_IMG2 0
 
 #define CONFIG_RTL8195A 1
 #undef  CONFIG_FPGA
