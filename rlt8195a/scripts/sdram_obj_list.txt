@@ -104,5 +104,5 @@
 *bufhelper.o(.text*)
 *stackctrl.o(.text*)
 *smallint.o(.text*)
-*.o (.text*)
+*/py/*.o (.text*)
 
