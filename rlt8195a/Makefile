@@ -187,6 +187,9 @@ SRC_C += $(wildcard libameba/sdk/component/common/api/*.c)
 SRC_C += $(wildcard libameba/sdk/component/common/network/dhcp/*.c)
 SRC_C += $(wildcard libameba/sdk/component/soc/realtek/8195a/cmsis/device/*c)
 SRC_C += $(wildcard libameba/sdk/component/common/api/network/src/*.c)
+SRC_C += $(wildcard libameba/sdk/component/common/network/ssl/polarssl-1.3.8/library/*.c)
+SRC_C += rlt8195a/libameba/sdk/component/common/network/ssl/ssl_ram_map/rom/rom_ssl_ram_map.c
+SRC_C += rlt8195a/libameba/sdk/component/common/network/ssl/ssl_ram_map/ssl_ram_map.c
 
 #-------------------------------------------------------------------------------
 # External C source files and objects

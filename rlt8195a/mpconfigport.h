@@ -47,7 +47,7 @@
 #define MICROPY_PY_OS_DUPTERM                   (1)
 #define MICROPY_PY_WEBSOCKET                    (1)
 #define MICROPY_PY_IO_FILEIO                    (1)
-#define MICROPY_PY_UHASHLIB                     (1)
+#define MICROPY_PY_UHASHLIB                     (0)
 #define MICROPY_PY_UCTYPES                      (1)
 #define MICROPY_PY_UJSON                        (1)
 #define MICROPY_PY_FRAMEBUF                     (1)

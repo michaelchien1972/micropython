@@ -70,6 +70,9 @@ SECTIONS
   {
     __sdram_data_start__ = .;
     *(.mon.ram.text*)
+    *(.ssl_ram_map*)
+    *(.ssl.rom.rodata*)
+    *(.ssl.rom.text*)
     INCLUDE "sdram_obj_list.txt"
     *(.sdram.text*)
     *(.sdram.data*)

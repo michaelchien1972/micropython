@@ -1,4 +1,5 @@
 #define CONFIG_SSL_RSA	1
+#define __CC_ARM
 
 #if !defined (__GNUC__)
 #include "platform_stdlib.h"
