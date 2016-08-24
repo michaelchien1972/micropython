@@ -65,5 +65,9 @@ extern const struct _mp_obj_fun_builtin_t mp_builtin_open_obj;
 #define MICROPY_PORT_BUILTINS \
     { MP_OBJ_NEW_QSTR(MP_QSTR_open), (mp_obj_t)&mp_builtin_open_obj },
 
+#define MP_STATE_PORT MP_STATE_VM
+#define MICROPY_PORT_ROOT_POINTERS                                        \
+    const char *readline_hist[8];                                         \
+
 // We need to provide a declaration/definition of alloca()
 #include <alloca.h>

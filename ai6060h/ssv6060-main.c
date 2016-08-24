@@ -44,6 +44,15 @@
 #include "py/compile.h"
 #include "py/gc.h"
 
+#include "readline.h"
+
+#include "sys/clock.h"
+#include "debug-uart.h"
+
+#include "serial_api.h"
+
+#include "mphal.h"
+
 #include "contiki.h"
 #include <string.h>
 #include <stdio.h> /* For printf() */
@@ -102,8 +111,14 @@ AUTOSTART_PROCESSES(&main_process);
 PROCESS_THREAD(main_process, ev, data)
 {
     PROCESS_BEGIN();
-    printf("********hello main_process********\n");
-    TurnOffAllLED();
+    mp_init();
+    mp_obj_list_init(mp_sys_path, 0);
+    mp_obj_list_init(mp_sys_argv, 0);
+    mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR_));
+    readline_init0();
+    clock_init();
+    mphal_init();
+    printf("********mp init ********\n");
     PROCESS_END();
 }
 
