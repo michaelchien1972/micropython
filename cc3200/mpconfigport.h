@@ -102,6 +102,8 @@
 #define MICROPY_PY_CMATH                            (0)
 #define MICROPY_PY_IO                               (1)
 #define MICROPY_PY_IO_FILEIO                        (1)
+#define MICROPY_PY_THREAD                           (1)
+#define MICROPY_PY_THREAD_GIL                       (1)
 #define MICROPY_PY_UBINASCII                        (0)
 #define MICROPY_PY_UCTYPES                          (0)
 #define MICROPY_PY_UZLIB                            (0)
@@ -183,8 +185,6 @@ extern const struct _mp_obj_module_t mp_module_ussl;
 
 typedef int32_t         mp_int_t;                   // must be pointer size
 typedef unsigned int    mp_uint_t;                  // must be pointer size
-typedef void            *machine_ptr_t;             // must be of pointer size
-typedef const void      *machine_const_ptr_t;       // must be of pointer size
 typedef long            mp_off_t;
 
 #define MP_PLAT_PRINT_STRN(str, len) mp_hal_stdout_tx_strn_cooked(str, len)
@@ -195,14 +195,6 @@ typedef long            mp_off_t;
 // assembly functions to handle critical sections, interrupt
 // disabling/enabling and sleep mode enter/exit
 #include "cc3200_asm.h"
-
-// There is no classical C heap in bare-metal ports, only Python
-// garbage-collected heap. For completeness, emulate C heap via
-// GC heap. Note that MicroPython core never uses malloc() and friends,
-// so these defines are mostly to help extension module writers.
-#define malloc                                      gc_alloc
-#define free                                        gc_free
-#define realloc                                     gc_realloc
 
 // We need to provide a declaration/definition of alloca()
 #include <alloca.h>

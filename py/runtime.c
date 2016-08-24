@@ -91,6 +91,12 @@ void mp_init(void) {
     // start with no extensions to builtins
     MP_STATE_VM(mp_module_builtins_override_dict) = NULL;
     #endif
+
+    #if MICROPY_PY_THREAD_GIL
+    mp_thread_mutex_init(&MP_STATE_VM(gil_mutex));
+    #endif
+
+    MP_THREAD_GIL_ENTER();
 }
 
 void mp_deinit(void) {
@@ -1384,6 +1390,18 @@ void *m_malloc_fail(size_t num_bytes) {
     }
 }
 
+NORETURN void mp_raise_msg(const mp_obj_type_t *exc_type, const char *msg) {
+    nlr_raise(mp_obj_new_exception_msg(exc_type, msg));
+}
+
+NORETURN void mp_raise_ValueError(const char *msg) {
+    mp_raise_msg(&mp_type_ValueError, msg);
+}
+
+NORETURN void mp_raise_TypeError(const char *msg) {
+    mp_raise_msg(&mp_type_TypeError, msg);
+}
+
 NORETURN void mp_not_implemented(const char *msg) {
-    nlr_raise(mp_obj_new_exception_msg(&mp_type_NotImplementedError, msg));
+    mp_raise_msg(&mp_type_NotImplementedError, msg);
 }

@@ -26,6 +26,7 @@
  */
 
 #include <stdint.h>
+#include <stdio.h>
 
 #include "py/obj.h"
 #include "py/runtime.h"
@@ -82,6 +83,18 @@ STATIC mp_obj_t machine_unique_id(void) {
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_0(machine_unique_id_obj, machine_unique_id);
 
+STATIC mp_obj_t machine_idle(void) {
+    asm("waiti 0");
+    return mp_const_none;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_0(machine_idle_obj, machine_idle);
+
+STATIC mp_obj_t machine_sleep(void) {
+    printf("Warning: not yet implemented\n");
+    return mp_const_none;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_0(machine_sleep_obj, machine_sleep);
+
 STATIC mp_obj_t machine_deepsleep(void) {
     // default to sleep forever
     uint32_t sleep_us = 0;
@@ -103,6 +116,8 @@ STATIC mp_obj_t machine_deepsleep(void) {
         }
     }
 
+    // prepare for RTC reset at wake up
+    rtc_prepare_deepsleep(sleep_us);
     // put the device in a deep-sleep state
     system_deep_sleep_set_option(0); // default power down mode; TODO check this
     system_deep_sleep(sleep_us);
@@ -191,13 +206,21 @@ const mp_obj_type_t esp_timer_type = {
     .locals_dict = (mp_obj_t)&esp_timer_locals_dict,
 };
 
+// this bit is unused in the Xtensa PS register
+#define ETS_LOOP_ITER_BIT (12)
+
 STATIC mp_obj_t machine_disable_irq(void) {
-    return mp_obj_new_int(disable_irq());
+    uint32_t state = disable_irq();
+    state = (state & ~(1 << ETS_LOOP_ITER_BIT)) | (ets_loop_iter_disable << ETS_LOOP_ITER_BIT);
+    ets_loop_iter_disable = 1;
+    return mp_obj_new_int(state);
 }
 MP_DEFINE_CONST_FUN_OBJ_0(machine_disable_irq_obj, machine_disable_irq);
 
-STATIC mp_obj_t machine_enable_irq(mp_obj_t state) {
-    enable_irq(mp_obj_get_int(state));
+STATIC mp_obj_t machine_enable_irq(mp_obj_t state_in) {
+    uint32_t state = mp_obj_get_int(state_in);
+    ets_loop_iter_disable = (state >> ETS_LOOP_ITER_BIT) & 1;
+    enable_irq(state & ~(1 << ETS_LOOP_ITER_BIT));
     return mp_const_none;
 }
 MP_DEFINE_CONST_FUN_OBJ_1(machine_enable_irq_obj, machine_enable_irq);
@@ -212,6 +235,8 @@ STATIC const mp_rom_map_elem_t machine_module_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR_reset), MP_ROM_PTR(&machine_reset_obj) },
     { MP_ROM_QSTR(MP_QSTR_reset_cause), MP_ROM_PTR(&machine_reset_cause_obj) },
     { MP_ROM_QSTR(MP_QSTR_unique_id), MP_ROM_PTR(&machine_unique_id_obj) },
+    { MP_ROM_QSTR(MP_QSTR_idle), MP_ROM_PTR(&machine_idle_obj) },
+    { MP_ROM_QSTR(MP_QSTR_sleep), MP_ROM_PTR(&machine_sleep_obj) },
     { MP_ROM_QSTR(MP_QSTR_deepsleep), MP_ROM_PTR(&machine_deepsleep_obj) },
 
     { MP_ROM_QSTR(MP_QSTR_disable_irq), MP_ROM_PTR(&machine_disable_irq_obj) },
@@ -226,7 +251,9 @@ STATIC const mp_rom_map_elem_t machine_module_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR_ADC), MP_ROM_PTR(&pyb_adc_type) },
     { MP_ROM_QSTR(MP_QSTR_UART), MP_ROM_PTR(&pyb_uart_type) },
     { MP_ROM_QSTR(MP_QSTR_I2C), MP_ROM_PTR(&machine_i2c_type) },
-    { MP_ROM_QSTR(MP_QSTR_SPI), MP_ROM_PTR(&pyb_spi_type) },
+    { MP_ROM_QSTR(MP_QSTR_SoftSPI), MP_ROM_PTR(&pyb_spi_type) },
+    { MP_ROM_QSTR(MP_QSTR_HSPI), MP_ROM_PTR(&pyb_hspi_type) },
+    { MP_ROM_QSTR(MP_QSTR_SPI), MP_ROM_PTR(&machine_spi_type) },
 
     // wake abilities
     { MP_ROM_QSTR(MP_QSTR_DEEPSLEEP), MP_ROM_INT(MACHINE_WAKE_DEEPSLEEP) },

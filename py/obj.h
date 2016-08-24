@@ -31,15 +31,15 @@
 #include "py/qstr.h"
 #include "py/mpprint.h"
 
-// All Micro Python objects are at least this type
-// The bit-size must be at least pointer size
-
+// This is the definition of the opaque MicroPython object type.
+// All concrete objects have an encoding within this type and the
+// particular encoding is specified by MICROPY_OBJ_REPR.
 #if MICROPY_OBJ_REPR == MICROPY_OBJ_REPR_D
 typedef uint64_t mp_obj_t;
 typedef uint64_t mp_const_obj_t;
 #else
-typedef machine_ptr_t mp_obj_t;
-typedef machine_const_ptr_t mp_const_obj_t;
+typedef void *mp_obj_t;
+typedef const void *mp_const_obj_t;
 #endif
 
 // This mp_obj_type_t struct is a concrete MicroPython object which holds info
@@ -484,7 +484,8 @@ struct _mp_obj_type_t {
     mp_fun_1_t iternext; // may return MP_OBJ_STOP_ITERATION as an optimisation instead of raising StopIteration() (with no args)
 
     mp_buffer_p_t buffer_p;
-    const mp_stream_p_t *stream_p;
+    // One of disjoint protocols (interfaces), like mp_stream_p_t, etc.
+    const void *protocol;
 
     // these are for dynamically created types (classes)
     struct _mp_obj_tuple_t *bases_tuple;

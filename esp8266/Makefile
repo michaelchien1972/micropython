@@ -4,13 +4,18 @@ include ../py/mkenv.mk
 QSTR_DEFS = qstrdefsport.h #$(BUILD)/pins_qstr.h
 
 MICROPY_PY_USSL = 1
+MICROPY_SSL_AXTLS = 1
+MICROPY_PY_BTREE = 1
 
 # include py core make definitions
 include ../py/py.mk
 
+MPY_CROSS = ../mpy-cross/mpy-cross
+MPY_TOOL = ../tools/mpy-tool.py
 MAKE_FROZEN = ../tools/make-frozen.py
 
 SCRIPTDIR = scripts
+FROZEN_MPY_DIR = modules
 PORT ?= /dev/ttyACM0
 BAUD ?= 115200
 CROSS_COMPILE = xtensa-lx106-elf-
@@ -73,7 +78,9 @@ SRC_C = \
 	modpybrtc.c \
 	modpybadc.c \
 	modpybuart.c \
+	modmachinespi.c \
 	modpybspi.c \
+	modpybhspi.c \
 	modesp.c \
 	modnetwork.c \
 	modutime.c \
@@ -84,6 +91,8 @@ SRC_C = \
 	$(BUILD)/frozen.c \
 	fatfs_port.c \
 	axtls_helpers.c \
+	hspi.c \
+	$(SRC_MOD)
 
 STM_SRC_C = $(addprefix stmhal/,\
 	pybstdio.c \
@@ -131,6 +140,9 @@ DRIVERS_SRC_C = $(addprefix drivers/,\
 SRC_S = \
 	gchelper.s \
 
+FROZEN_MPY_PY_FILES := $(shell find $(FROZEN_MPY_DIR)/ -type f -name '*.py')
+FROZEN_MPY_MPY_FILES := $(addprefix $(BUILD)/,$(FROZEN_MPY_PY_FILES:.py=.mpy))
+
 OBJ =
 OBJ += $(PY_O)
 OBJ += $(addprefix $(BUILD)/, $(SRC_C:.c=.o))
@@ -139,6 +151,7 @@ OBJ += $(addprefix $(BUILD)/, $(STM_SRC_C:.c=.o))
 OBJ += $(addprefix $(BUILD)/, $(EXTMOD_SRC_C:.c=.o))
 OBJ += $(addprefix $(BUILD)/, $(LIB_SRC_C:.c=.o))
 OBJ += $(addprefix $(BUILD)/, $(DRIVERS_SRC_C:.c=.o))
+OBJ += $(BUILD)/$(BUILD)/frozen_mpy.o
 #OBJ += $(BUILD)/pins_$(BOARD).o
 
 # List of sources for qstr extraction
@@ -146,7 +159,7 @@ SRC_QSTR += $(SRC_C) $(STM_SRC_C) $(EXTMOD_SRC_C) $(DRIVERS_SRC_C)
 # Append any auto-generated sources that are needed by sources listed in SRC_QSTR
 SRC_QSTR_AUTO_DEPS +=
 
-all: $(BUILD)/firmware-combined.bin
+all: $(BUILD)/libaxtls.a $(BUILD)/firmware-combined.bin
 
 CONFVARS_FILE = $(BUILD)/confvars
 
@@ -163,11 +176,22 @@ $(BUILD)/frozen.c: $(wildcard $(SCRIPTDIR)/*) $(CONFVARS_FILE)
 	$(ECHO) "Generating $@"
 	$(Q)$(MAKE_FROZEN) $(SCRIPTDIR) > $@
 
+# to build .mpy files from .py files
+$(BUILD)/$(FROZEN_MPY_DIR)/%.mpy: $(FROZEN_MPY_DIR)/%.py
+	@$(ECHO) "MPY $<"
+	$(Q)$(MKDIR) -p $(dir $@)
+	$(Q)$(MPY_CROSS) -o $@ -s $(^:$(FROZEN_MPY_DIR)/%=%) $^
+
+# to build frozen_mpy.c from all .mpy files
+$(BUILD)/frozen_mpy.c: $(FROZEN_MPY_MPY_FILES) $(BUILD)/genhdr/qstrdefs.generated.h
+	@$(ECHO) "Creating $@"
+	$(Q)$(PYTHON) $(MPY_TOOL) -f -q $(BUILD)/genhdr/qstrdefs.preprocessed.h $(FROZEN_MPY_MPY_FILES) > $@
+
 .PHONY: deploy
 
 deploy: $(BUILD)/firmware-combined.bin
 	$(ECHO) "Writing $< to the board"
-	$(Q)esptool.py --port $(PORT) --baud $(BAUD) write_flash --flash_size=8m 0 $<
+	$(Q)esptool.py --port $(PORT) --baud $(BAUD) write_flash --verify --flash_size=8m 0 $<
 	#$(Q)esptool.py --port $(PORT) --baud $(BAUD) write_flash --flash_size=8m 0 $(BUILD)/firmware.elf-0x00000.bin 0x9000 $(BUILD)/firmware.elf-0x0[1-f]000.bin
 
 reset:
@@ -211,8 +235,11 @@ $(BUILD)/firmware.elf: $(OBJ)
 
 include ../py/mkrules.mk
 
-axtls:
+axtls: $(BUILD)/libaxtls.a
+
+$(BUILD)/libaxtls.a:
 	cd ../lib/axtls; cp config/upyconfig config/.config
 	cd ../lib/axtls; make oldconfig -B
 	cd ../lib/axtls; make clean
 	cd ../lib/axtls; make all CC="$(CC)" LD="$(LD)" AR="$(AR)" CFLAGS_EXTRA="$(CFLAGS_XTENSA) -Dabort=abort_ -DRT_MAX_PLAIN_LENGTH=1024 -DRT_EXTRA=3072"
+	cp ../lib/axtls/_stage/libaxtls.a $@

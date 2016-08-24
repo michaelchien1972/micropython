@@ -3,11 +3,17 @@
 Quick reference for the ESP8266
 ===============================
 
-.. image:: https://learn.adafruit.com/system/assets/assets/000/028/689/medium640/adafruit_products_pinoutstop.jpg
+.. image:: img/adafruit_products_pinoutstop.jpg
     :alt: Adafruit Feather HUZZAH board
     :width: 640px
 
 The Adafruit Feather HUZZAH board (image attribution: Adafruit).
+
+Installing MicroPython
+----------------------
+
+See the corresponding section of tutorial: :ref:`intro`. It also includes
+a troubleshooting subsection.
 
 General board control
 ---------------------
@@ -183,6 +189,20 @@ The SPI driver is implemented in software and works on all pins::
     spi.write_readinto(b'1234', buf) # write to MOSI and read from MISO into the buffer
     spi.write_readinto(buf, buf) # write buf to MOSI and read MISO back into buf
 
+
+Hardware SPI
+------------
+
+The hardware SPI is faster (up to 80Mhz), but only works on following pins:
+``MISO`` is gpio2, ``MOSI`` is gpio13, and ``SCK`` is gpio14. It has the same
+methods as SPI, except for the pin parameters for the constructor and init
+(as those are fixed).
+
+    from machine import Pin, HSPI
+
+    hspi = HSPI(baudrate=800000000, polarity=0, phase=0)
+
+
 I2C bus
 -------
 
@@ -291,31 +311,53 @@ For low-level driving of an APA102::
     import esp
     esp.apa102_write(clock_pin, data_pin, rgbi_buf)
 
+DHT driver
+----------
+
+The DHT driver is implemented in software and works on all pins::
+
+    import dht
+    import machine
+
+    d = dht.DHT11(machine.Pin(4))
+    d.measure()
+    d.temperature() # eg. 23 (°C)
+    d.humidity()    # eg. 41 (% RH)
+
+    d = dht.DHT22(machine.Pin(4))
+    d.measure()
+    d.temperature() # eg. 23.6 (°C)
+    d.humidity()    # eg. 41.3 (% RH)
+
 WebREPL (web browser interactive prompt)
 ----------------------------------------
 
 WebREPL (REPL over WebSockets, accessible via a web browser) is an
 experimental feature available in ESP8266 port. Download web client
-from https://github.com/micropython/webrepl , and start daemon using::
+from https://github.com/micropython/webrepl (hosted version available
+at http://micropython.org/webrepl), and start the daemon on a device
+using::
 
     import webrepl
     webrepl.start()
 
-(Release version will have it started on boot by default.)
+(Release versions have it started on boot by default.)
 
 On a first connection, you will be prompted to set password for future
 sessions to use.
 
 The supported way to use WebREPL is by connecting to ESP8266 access point,
 but the daemon is also started on STA interface if it is active, so if your
-routers is set up and works correctly, you may also use it while connecting
-to your normal Internet access point (use ESP8266 AP connection method if
-face any issues).
+router is set up and works correctly, you may also use WebREPL while connected
+to your normal Internet access point (use the ESP8266 AP connection method
+if you face any issues).
 
 WebREPL is an experimental feature and a work in progress, and has known
-issues. There's also provision to transfer (both upload and download)
-files over WebREPL connection, but it has unstable status (be ready to
-reboot a module in case of issues). It still may be a practical way to
+issues.
+
+There's also provision to transfer (both upload and download)
+files over WebREPL connection, but it has even more experimental status
+than the WebREPL terminal mode. It is still a practical way to
 get script files onto ESP8266, so give it a try using ``webrepl_cli.py``
-from the repository above. See forum for other community-supported
-alternatives to transfer files to ESP8266.
+from the repository above. See the MicroPython forum for other
+community-supported alternatives to transfer files to ESP8266.

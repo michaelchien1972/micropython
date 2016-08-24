@@ -52,7 +52,7 @@ For your convenience, some of technical specifications are provided below:
   external FlashROM, UART, deep sleep wake-up, etc.)
 * UART: One RX/TX UART (no hardware handshaking), one TX-only UART.
 * SPI: 2 SPI interfaces (one used for FlashROM).
-* I2C: No native extenal I2C (bitbang implementation available on any pins).
+* I2C: No native external I2C (bitbang implementation available on any pins).
 * I2S: 1.
 * Programming: using BootROM bootloader from UART. Due to external FlashROM
   and always-available BootROM bootloader, ESP8266 is not brickable.
@@ -72,10 +72,10 @@ modifying the standard process).
 
 Once the filesystem is mounted, ``boot.py`` is executed from it. The standard
 version of this file is created during first-time module set up and by
-defaults starts up a WebREPL daemon to handle incoming connections. This
+default starts up a WebREPL daemon to handle incoming connections. This
 file is customizable by end users (for example, you may want to disable
 WebREPL for extra security, or add other services which should be run on
-module start-up). But keep in mind that incorrect modifications to boot.py
+a module start-up). But keep in mind that incorrect modifications to boot.py
 may still lead to boot loops or lock ups, requiring to reflash a module
 from scratch.
 
@@ -91,3 +91,12 @@ the following in ``main.py``::
 
 This will allow to keep the structure of your application clear, as well as
 allow to install multiple applications on a board, and switch among them.
+
+
+Real-time clock
+---------------
+
+Due to limitations of the ESP8266 chip the internal real-time clock (RTC)
+will overflow every 7:45h.  If a long-term working RTC time is required then
+``time()`` or ``localtime()`` must be called at least once within 7 hours.
+MicroPython will then handle the overflow.

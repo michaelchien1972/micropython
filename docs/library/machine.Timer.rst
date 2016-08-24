@@ -1,4 +1,4 @@
-.. _machine.Timer:
+.. currentmodule:: machine
 
 class Timer -- control internal timers
 ======================================
@@ -59,7 +59,7 @@ class Timer -- control internal timers
 Constructors
 ------------
 
-.. class:: machine.Timer(id, ...)
+.. class:: Timer(id, ...)
 
     .. only:: port_wipy
 
@@ -71,7 +71,7 @@ Methods
 
 .. only:: port_wipy
 
-    .. method:: timer.init(mode, \*, width=16)
+    .. method:: Timer.init(mode, \*, width=16)
 
        Initialise the timer. Example::
 
@@ -92,19 +92,19 @@ Methods
            (or large periods), 32-bit timers should be used. 32-bit mode is only available
            for ``ONE_SHOT`` AND ``PERIODIC`` modes.
 
-.. method:: timer.deinit()
+.. method:: Timer.deinit()
 
    Deinitialises the timer. Disables all channels and associated IRQs.
    Stops the timer, and disables the timer peripheral.
 
 .. only:: port_wipy
 
-    .. method:: timer.channel(channel, \**, freq, period, polarity=Timer.POSITIVE, duty_cycle=0)
+    .. method:: Timer.channel(channel, \**, freq, period, polarity=Timer.POSITIVE, duty_cycle=0)
     
        If only a channel identifier passed, then a previously initialized channel
        object is returned (or ``None`` if there is no previous channel).
 
-       Othwerwise, a TimerChannel object is initialized and returned.
+       Otherwise, a TimerChannel object is initialized and returned.
        
        The operating mode is is the one configured to the Timer object that was used to
        create the channel.
@@ -152,7 +152,7 @@ Methods
 
     .. method:: timerchannel.irq(\*, trigger, priority=1, handler=None)
 
-        The behavior of this callback is heaviliy dependent on the operating
+        The behavior of this callback is heavily dependent on the operating
         mode of the timer channel:
 
             - If mode is ``Timer.PERIODIC`` the callback is executed periodically
