@@ -36,6 +36,14 @@
  * \author
  *         Adam Dunkels <adam@sics.se>
  */
+
+#include "py/mpconfig.h"
+#include "lib/utils/pyexec.h"
+#include "py/obj.h"
+#include "py/runtime.h"
+#include "py/compile.h"
+#include "py/gc.h"
+
 #include "contiki.h"
 #include <string.h>
 #include <stdio.h> /* For printf() */
@@ -98,3 +106,16 @@ PROCESS_THREAD(main_process, ev, data)
     TurnOffAllLED();
     PROCESS_END();
 }
+
+mp_import_stat_t mp_import_stat(const char *path) {
+    return 0;
+}
+
+mp_lexer_t *mp_lexer_new_from_file(const char *filename) {
+    return 0;
+}
+
+mp_obj_t mp_builtin_open(uint n_args, const mp_obj_t *args, mp_map_t *kwargs) {
+    return mp_const_none;
+}
+MP_DEFINE_CONST_FUN_OBJ_KW(mp_builtin_open_obj, 1, mp_builtin_open);

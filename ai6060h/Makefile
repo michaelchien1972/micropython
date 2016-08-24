@@ -1,13 +1,18 @@
+include ../py/mkenv.mk
+
+# qstr definitions (must come before including py.mk)
+QSTR_DEFS = qstrdefsport.h
+
+# include py core make definitions
+include ../py/py.mk
+
 ### DEfine the CPU directory
 include Makefile.mk
 
 MAC_BIN = ssv6060_mac.hex
 CONTIKI_PROJECT=ssv6060-main
 CONTIKI_SRC=$(CONTIKI_PROJECT).c    ###You can add other source code here!!! ###
-#CONTIKI_SRC=$(CONTIKI_PROJECT).c test1.c
-CONTIKI_OBJ=$(patsubst %.c,%.o,$(CONTIKI_SRC))
-
-
+OBJ=$(PY_O) $(patsubst %.c,%.o,$(CONTIKI_SRC))
 
 TARGET=cabrio
 CRT0 = boot.s
@@ -27,9 +32,11 @@ STRIP    = $(CROSS)strip
 OBJDUMP  = $(CROSS)objdump
 
 # -nostdlib -falign-functions=4 -falign-jumps -falign-loops -falign-labels
-DBGFLAGS   = -g
-OPTFLAGS   = -Os -fomit-frame-pointer
+#DBGFLAGS   = -g
+OPTFLAGS   = -Os -fomit-frame-pointer -std=gnu99
 INCLUDE    = -I./icomlib/include -I./icomlib/include/net -I./icomlib/include/bsp -I./icomlib/include/net/ieee80211_bss -I./icomlib/include/sys -I./icomlib/include/net/mac -I./icomlib/include/dev  -I./icomlib/include/matrixssl -I./include
+
+INCLUDE   += -I. -I.. -I$(BUILD)
 
 CPPFLAGS  += $(INCLUDE) $(OPTFLAGS) $(DBGFLAGS)
 ARCH_FLAGS = -march=armv3m -mno-thumb-interwork 
@@ -86,12 +93,12 @@ ssv6060-main.bin: ssv6060-main.elf
 		@echo "### You can use 'make asm' to generate dis-assembly file!!###"
 		@echo "#############################################################"
 
-clean:
-	/bin/rm -f *.o *.elf
-	/bin/rm -f icomlib.a icomapps.a contikilib.a *.bin *.asm *.map
-	cd icomlib && make clean
-	cd icomapps && make clean
-	cd contikilib && make clean
+#clean:
+#	/bin/rm -f *.o *.elf
+#	/bin/rm -f icomlib.a icomapps.a contikilib.a *.bin *.asm *.map
+#	cd icomlib && make clean
+#	cd icomapps && make clean
+#	cd contikilib && make clean
 
 #ssv6060-main.o:ssv6060-main.c
 #	$(CC) $(CFLAGS) -DAUTOSTART_ENABLE -c ssv6060-main.c -o ssv6060-main.o
@@ -129,13 +136,14 @@ warn:
 		@./util/chk_warning.pl	compile.log > warn.log.txt  
 
 print:
-		echo $(CONTIKI_OBJ)
+		echo $(OBJ)
 
-ssv6060-main.elf: $(CONTIKI_OBJ) icomlib/icomlib.a icomapps/icomapps.a contikilib/contikilib.a $(LINKERSCRIPT)
+ssv6060-main.elf: $(OBJ) icomlib/icomlib.a icomapps/icomapps.a contikilib/contikilib.a $(LINKERSCRIPT)
 	# WARNING: if you need math.h. You need to add -lm into this linking stage.Please reference where -lm being added 
 	#$(CC) $(LDFLAGS) $(CFLAGS) $(filter-out %.a %.lds,$^) $(filter %.a,$^) -lc $(filter %.a,$^) -lm -o $@ $(ADD_LIB)
 	/bin/cp icomlib/icomlib.a . ### use cp to copy library or the linker script will have problem for hierachy issue ###
 	/bin/cp icomapps/icomapps.a . ### use cp to copy library or the linker script will have problem for hierachy issue ###
 	/bin/cp contikilib/contikilib.a . ### use cp to copy library or the linker script will have problem for hierachy issue ###
-	$(CC) $(LDFLAGS) $(CFLAGS) $(CONTIKI_OBJ) icomlib.a icomapps.a icomlib.a contikilib.a -o ssv6060-main.elf -L ./thirdPartyLib -lairkiss 
+	$(CC) $(LDFLAGS) $(CFLAGS) $(OBJ) icomlib.a icomapps.a icomlib.a contikilib.a -o ssv6060-main.elf -L ./thirdPartyLib -lairkiss 
 
+include ../py/mkrules.mk
