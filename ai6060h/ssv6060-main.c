@@ -42,27 +42,13 @@
 #include "gpio_api.h"
 #include "atcmd.h"
 
-int AT_Customer(stParam *param);
-int AT_Customer2(stParam *param);
-int AT_TCPSERVER_DEMO(stParam *param);
-int AT_WIFIUART_DEMO(stParam *param);
-
 at_cmd_info atcmd_info_tbl[] = 
 {
-	{"AT+CUSTOMER_CMD",	&AT_Customer},
-	{"AT+CUSTOMER_CMD2=",	&AT_Customer2},
-	{"AT+TCPSERVER_DEMO=",	&AT_TCPSERVER_DEMO},
-	{"AT+WIFIUART_DEMO=",&AT_WIFIUART_DEMO},
-    //
     {"",    NULL}
 };
-
-//extern void test1();
 /*---------------------------------------------------------------------------*/
 PROCESS(main_process, "main process");
 /*---------------------------------------------------------------------------*/
-PROCESS_NAME(tcpServerDemo_process);
-PROCESS_NAME(wifiUartDemo_process);
 /*---------------------------------------------------------------------------*/
 AUTOSTART_PROCESSES(&main_process);
 /*---------------------------------------------------------------------------*/
@@ -104,59 +90,11 @@ AUTOSTART_PROCESSES(&main_process);
  	return ERROR_SUCCESS;
  }
 
-int AT_Customer(stParam *param)
-{
-	printf("Call AT_Customer\n");
-	return 0;
-}
-int AT_Customer2(stParam *param)
-{
-	int i = 0;
-	printf("Call AT_Customer2\n");
-	for(i=0; i<param->argc; i++)
-	{
-		printf("Param%d:%s\n", i+1, param->argv[i]);
-	}
-	return 0;
-}
-int AT_WIFIUART_DEMO(stParam *param)
-{
-	int i = 0;
-	printf("Call AT_WIFIUART_DEMO\n");
-	if(strcmp(param->argv[0] ,"enable") == 0) {
-		process_start(&wifiUartDemo_process, NULL);
-	} else if(strcmp(param->argv[0] ,"disable") == 0) {
-		process_post_synch(&wifiUartDemo_process, PROCESS_EVENT_EXIT, NULL);
-	} else {
-		printf("wifi uart demo unknown param, please check\n");
-	}
-	return 0;
-}
-int AT_TCPSERVER_DEMO(stParam *param)
-{
-	int i = 0;
-	printf("Call AT_TCPSERVER_DEMO\n");
-	if(strcmp(param->argv[0] ,"enable") == 0) {
-		process_start(&tcpServerDemo_process, NULL);
-	} else if(strcmp(param->argv[0] ,"disable") == 0) {
-		process_post_synch(&tcpServerDemo_process, PROCESS_EVENT_EXIT, NULL);
-	} else {
-		printf("tcp server demo unknown param, please check\n");
-	}
-	return 0;
-}
 /*---------------------------------------------------------------------------*/
 PROCESS_THREAD(main_process, ev, data)
 {
-    //    EVENTMSG_DATA *pMesg = NULL;
     PROCESS_BEGIN();
-
-    //printf("********hello main_process********\n");
-    //test1();
-  
+    printf("********hello main_process********\n");
     TurnOffAllLED();
-
-
-
     PROCESS_END();
 }

@@ -13,7 +13,7 @@
 #define CFG_AUTO_CONNECT (1)    //if ssid being recorded in file system,iot will start to connect to AP.
 
 //flash layout
-#define CFG_OTA_ENABLE (1)  //if OTA being eanbled,it will cost a lot of flash space.
+#define CFG_OTA_ENABLE (0)  //if OTA being eanbled,it will cost a lot of flash space.
 
 
 #if (MODULE_ID==MODULE_S092)    
