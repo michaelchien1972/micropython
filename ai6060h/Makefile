@@ -13,12 +13,15 @@ MAC_BIN = ssv6060_mac.hex
 CONTIKI_PROJECT=ssv6060-main
 CONTIKI_SRC += $(CONTIKI_PROJECT).c \
 			   mphal.c \
+			   gccollect.c \
 			   lib/mp-readline/readline.c \
+			   lib/utils/pyexec.c \
+			   lib/utils/pyhelp.c \
 
 CONTIKI_SRC += $(wildcard contikilib/*.c) 
 CONTIKI_SRC += $(wildcard icomapps/*.c) 
 
-OBJ=$(PY_O) $(patsubst %.c,$(BUILD)/%.o,$(CONTIKI_SRC)) 
+OBJ=$(PY_O) $(patsubst %.c,$(BUILD)/%.o,$(CONTIKI_SRC)) $(patsubst %.c,$(BUILD)/%.o,$(CONTIKI_SRS))
 
 TARGET=cabrio
 CRT0 = boot.s
@@ -42,11 +45,12 @@ OBJDUMP  = $(CROSS)objdump
 OPTFLAGS   = -Os -fomit-frame-pointer -std=gnu99
 INCLUDE    = -I./icomlib/include -I./icomlib/include/net -I./icomlib/include/bsp -I./icomlib/include/net/ieee80211_bss -I./icomlib/include/sys -I./icomlib/include/net/mac -I./icomlib/include/dev  -I./icomlib/include/matrixssl -I./include
 
-INCLUDE   += -I. -I.. -I$(BUILD) -I../lib/mp-readline
+INCLUDE   += -I. -I.. -I$(BUILD) -I../lib/mp-readline -I../lib/utils
 
 CPPFLAGS  += $(INCLUDE) $(OPTFLAGS) $(DBGFLAGS)
 ARCH_FLAGS = -march=armv3m -mno-thumb-interwork 
-CFLAGS    += -Wall -Wno-trigraphs -fno-builtin $(CPPFLAGS) $(ARCH_FLAGS) -fdata-sections -ffunction-sections -DMODULE_ID=$(MODULE_ID) -DBOOT_SECTOR_UPDATE=$(BOOT_SECTOR_UPDATE) -DDISABLE_ICOMM_DISCOVER=$(DISABLE_ICOMM_DISCOVER) -Werror=implicit-function-declaration -Werror=maybe-uninitialized
+CFLAGS    += -Wall -Wno-trigraphs -fno-builtin $(CPPFLAGS) $(ARCH_FLAGS) -fdata-sections -ffunction-sections -DMODULE_ID=$(MODULE_ID) -DBOOT_SECTOR_UPDATE=$(BOOT_SECTOR_UPDATE) -DDISABLE_ICOMM_DISCOVER=$(DISABLE_ICOMM_DISCOVER) -Werror=maybe-uninitialized
+#CFLAGS    += -Werror=implicit-function-declaration
 CFLAGS += -DAUTOSTART_ENABLE
 
 
@@ -75,7 +79,7 @@ ssv6060-main.bin: ssv6060-main.elf
 		@test `stat -c %s $(MAC_BIN)` -eq 8192 || { echo "Please generate $(MAC_BIN),and file size must be 8192(Bytes) "; exit 1; }
 		$(OBJCOPY) -O binary $< $@
 		@echo -e "\n-----Check bin file size:($@)----->>>"
-		test `stat -c %s $@` -lt 384000	###acceptable if < 384KB### 
+		test `stat -c %s $@` -lt 484000	###acceptable if < 384KB### 
 		@echo "-----Done:bin file size:ok-----<<<"	
 		@echo "-----Generate bin for uart-upgrade-----"
 		dd skip=$(BOOT_CODE_AND_CONFIG_SIZE) if=$@ of=$(CONTIKI_PROJECT)_os.bin bs=1
@@ -135,6 +139,6 @@ ssv6060-main.elf: $(OBJ) icomlib/icomlib.a $(LINKERSCRIPT)
 	# WARNING: if you need math.h. You need to add -lm into this linking stage.Please reference where -lm being added 
 	#$(CC) $(LDFLAGS) $(CFLAGS) $(filter-out %.a %.lds,$^) $(filter %.a,$^) -lc $(filter %.a,$^) -lm -o $@ $(ADD_LIB)
 	/bin/cp icomlib/icomlib.a . ### use cp to copy library or the linker script will have problem for hierachy issue ###
-	$(CC) $(LDFLAGS) $(CFLAGS) $(OBJ) icomlib.a icomlib.a -o ssv6060-main.elf -L ./thirdPartyLib -lairkiss 
+	$(CC) $(LDFLAGS) $(CFLAGS) $(OBJ) icomlib.a icomlib.a -o ssv6060-main.elf -L ./thirdPartyLib -lairkiss -lm
 
 include ../py/mkrules.mk

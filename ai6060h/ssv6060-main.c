@@ -42,84 +42,76 @@
 #include "py/obj.h"
 #include "py/runtime.h"
 #include "py/compile.h"
-#include "py/gc.h"
 
 #include "readline.h"
+#include "pyexec.h"
 
 #include "sys/clock.h"
-#include "debug-uart.h"
-
-#include "serial_api.h"
 
 #include "mphal.h"
+#include "gccollect.h"
 
-#include "contiki.h"
-#include <string.h>
 #include <stdio.h> /* For printf() */
 #include "gpio_api.h"
 #include "atcmd.h"
+#include "bsp.h"
+#include "hw_init.h"
+
+const char *msg_0 = "Starting to execute main.py\r\n";
+const char *msg_1 = "REPL start failed\r\n";
 
 at_cmd_info atcmd_info_tbl[] = 
 {
     {"",    NULL}
 };
 /*---------------------------------------------------------------------------*/
-PROCESS(main_process, "main process");
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
-AUTOSTART_PROCESSES(&main_process);
-/*---------------------------------------------------------------------------*/
- void TurnOffAllLED()
- {
-	 GPIO_CONF conf;
- 
-	 conf.dirt = OUTPUT;
-	 conf.driving_en = 0;
-	 conf.pull_en = 0;
- 
-	 pinMode(GPIO_1, conf);
-	 digitalWrite(GPIO_1, 0);	 
-	 pinMode(GPIO_3, conf);
-	 digitalWrite(GPIO_3, 0);	 
-	 pinMode(GPIO_8, conf);
-	 digitalWrite(GPIO_8, 0);	 
- 
-	 return;
- }
-/*---------------------------------------------------------------------------*/
- int SetLED (uint8_t nEnable)
- {
- 	GPIO_CONF conf;
-
-	conf.dirt = OUTPUT;
-	conf.driving_en = 0;
-	conf.pull_en = 0;
-	
-	pinMode(GPIO_1, conf);
- 	if(nEnable == 0)
- 	{
- 		digitalWrite(GPIO_1, 0);
- 	}
- 	else
- 	{
- 		digitalWrite(GPIO_1, 1);
- 	}
- 	return ERROR_SUCCESS;
- }
-
-/*---------------------------------------------------------------------------*/
-PROCESS_THREAD(main_process, ev, data)
+int SetLED (uint8_t nEnable)
 {
-    PROCESS_BEGIN();
+	GPIO_CONF conf;
+
+   conf.dirt = OUTPUT;
+   conf.driving_en = 0;
+   conf.pull_en = 0;
+   
+   pinMode(GPIO_1, conf);
+	if(nEnable == 0)
+	{
+		digitalWrite(GPIO_1, 0);
+	}
+	else
+	{
+		digitalWrite(GPIO_1, 1);
+	}
+	return ERROR_SUCCESS;
+}
+
+int mp_main (void) {
+    gc_init(&__heap_start__, &__heap_end__);
     mp_init();
     mp_obj_list_init(mp_sys_path, 0);
     mp_obj_list_init(mp_sys_argv, 0);
     mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR_));
-    readline_init0();
+
     clock_init();
     mphal_init();
-    printf("********mp init ********\n");
-    PROCESS_END();
+    readline_init0();
+    mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR__slash_flash));
+    mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR__slash_flash_slash_lib));
+    mp_hal_stdout_tx_strn_cooked(msg_0, strlen(msg_0));
+
+    if(pyexec_friendly_repl() != 0) {
+        mp_hal_stdout_tx_strn_cooked(msg_1, strlen(msg_1));
+    }
+
+    return 0;
+}
+
+
+bool gDisableRTS = 0;
+int i_config = 0;
+
+void nlr_jump_fail(void *val) { 
+    printf("NLR failed\r\n");
 }
 
 mp_import_stat_t mp_import_stat(const char *path) {

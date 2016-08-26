@@ -30,49 +30,36 @@
 #include "lib/utils/pyexec.h"
 #include "py/ringbuf.h"
 
-#include "sys/clock.h"
-#include "debug-uart.h"
-#include "serial_api.h"
 #include "drv_uart.h"
+#include "clock.h"
 
 #include "mphal.h"
 
 STATIC byte input_buf_array[256];
 ringbuf_t input_buf = {input_buf_array, sizeof(input_buf_array)};
 
-void serial_callback(void *arg) {
-    S32 input;
-    while (1) {
-        input = drv_uart_rx(SSV6XXX_UART0);
-        if (input == -1)
-        {
-            break;
-        }
-        else {
-            printf("input is %d\r\n", input);
-        }
-    }
-}
-
 void mphal_init(void) {
-    SerialInit(BAUD_115200, serial_callback, NULL);
-}
+    drv_uart_init(AI6060H_CONSOLE_UART_PORT);
 
-void mp_hal_delay_us(uint32_t us) {
+    // Need to this function to calibrate clock..
+    drv_uart_26M();
 }
 
 int mp_hal_stdin_rx_chr(void) {
     for (;;) {
+#if 0
         int c = ringbuf_get(&input_buf);
+#else
+        int c = drv_uart_rx(AI6060H_CONSOLE_UART_PORT);
+#endif
         if (c != -1) {
             return c;
         }
-        mp_hal_delay_us(1);
     }
 }
 
 void mp_hal_stdout_tx_char(char c) {
-    dbg_putchar(c);
+    drv_uart_tx(AI6060H_CONSOLE_UART_PORT, c);
     //mp_uos_dupterm_tx_strn(&c, 1);
 }
 
@@ -88,6 +75,9 @@ void mp_hal_stdout_tx_strn(const char *str, uint32_t len) {
     }
 }
 
+void mp_hal_set_interrupt_char(int c) {
+}
+
 void mp_hal_stdout_tx_strn_cooked(const char *str, uint32_t len) {
     while (len--) {
         if (*str == '\n') {
@@ -99,7 +89,7 @@ void mp_hal_stdout_tx_strn_cooked(const char *str, uint32_t len) {
 
 uint32_t mp_hal_ticks_ms(void) {
     //TODO(It might not precise)
-    return clock_seconds();
+    return clock_time();
 }
 
 uint32_t mp_hal_ticks_us(void) {
@@ -109,4 +99,8 @@ uint32_t mp_hal_ticks_us(void) {
 
 void mp_hal_delay_ms(uint32_t delay) {
     clock_delay(delay * 1000);
+}
+
+void mp_hal_delay_us(uint32_t us) {
+    clock_delay(us);
 }
