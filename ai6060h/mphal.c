@@ -98,9 +98,10 @@ uint32_t mp_hal_ticks_us(void) {
 }
 
 void mp_hal_delay_ms(uint32_t delay) {
-    clock_delay(delay * 1000);
+    mp_hal_delay_us(delay * 1000);
 }
 
 void mp_hal_delay_us(uint32_t us) {
-    clock_delay(us);
+    //TODO(May not precise)
+    ssv_delay(1000 * 1300);
 }

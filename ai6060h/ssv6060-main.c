@@ -46,10 +46,12 @@
 #include "readline.h"
 #include "pyexec.h"
 
+
 #include "sys/clock.h"
 
 #include "mphal.h"
 #include "gccollect.h"
+#include "flash.h"
 
 #include <stdio.h> /* For printf() */
 #include "gpio_api.h"
@@ -59,6 +61,11 @@
 
 const char *msg_0 = "Starting to execute main.py\r\n";
 const char *msg_1 = "REPL start failed\r\n";
+static const char fresh_main_py[] =
+"# main.py -- put your code here! The script in main.py will be executed when boot up !\r\n"
+;
+
+fs_user_mount_t fs_user_mount_flash;
 
 at_cmd_info atcmd_info_tbl[] = 
 {
@@ -85,6 +92,38 @@ int SetLED (uint8_t nEnable)
 	return ERROR_SUCCESS;
 }
 
+void flash_vfs_init0 (void) {
+    fs_user_mount_t *vfs = &fs_user_mount_flash;
+    vfs->str = "/flash";
+    vfs->len = 6;
+    vfs->flags = 0;
+    flash_init0(vfs);
+    MP_STATE_PORT(fs_user_mount)[0] = vfs;
+    FRESULT res = f_mount(&vfs->fatfs, vfs->str, 1);
+    if (res == FR_NO_FILESYSTEM) {
+        res = f_mkfs("/flash", 1, 0);
+        if (res != FR_OK) {
+            MP_STATE_PORT(fs_user_mount)[0] = NULL;
+            return;
+        }
+    } else if (res == FR_OK) {
+        // To nothing if vfs mount success
+    } else {
+        printf("Create fatfs in flash failed, res = %d\r\n", res);
+        MP_STATE_PORT(fs_user_mount)[0] = NULL;
+        return;
+    }
+
+    FIL fp;
+    res = f_open(&fp, "/flash/main.py", FA_WRITE | FA_OPEN_ALWAYS);
+    UINT n;
+    res = f_write(&fp, fresh_main_py, sizeof(fresh_main_py) - 1 /* don't count null terminator */, &n);
+    f_close(&fp);
+    if (FR_OK != f_chdir ("/flash/lib")) {
+        f_mkdir("/flash/lib");
+    }
+}
+
 int mp_main (void) {
     gc_init(&__heap_start__, &__heap_end__);
     mp_init();
@@ -99,10 +138,14 @@ int mp_main (void) {
     mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR__slash_flash_slash_lib));
     mp_hal_stdout_tx_strn_cooked(msg_0, strlen(msg_0));
 
-    if(pyexec_friendly_repl() != 0) {
-        mp_hal_stdout_tx_strn_cooked(msg_1, strlen(msg_1));
-    }
+    flash_vfs_init0();
+    process_init();
 
+    for(;;) {
+        if(pyexec_friendly_repl() != 0) {
+            mp_hal_stdout_tx_strn_cooked(msg_1, strlen(msg_1));
+        }
+    }
     return 0;
 }
 
@@ -115,14 +158,14 @@ void nlr_jump_fail(void *val) {
 }
 
 mp_import_stat_t mp_import_stat(const char *path) {
-    return 0;
+    return fat_vfs_import_stat(path);
 }
 
 mp_lexer_t *mp_lexer_new_from_file(const char *filename) {
-    return 0;
+    return fat_vfs_lexer_new_from_file(filename);
 }
 
 mp_obj_t mp_builtin_open(uint n_args, const mp_obj_t *args, mp_map_t *kwargs) {
-    return mp_const_none;
+    return fatfs_builtin_open(n_args, args, kwargs);
 }
 MP_DEFINE_CONST_FUN_OBJ_KW(mp_builtin_open_obj, 1, mp_builtin_open);

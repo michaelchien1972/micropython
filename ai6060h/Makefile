@@ -13,10 +13,17 @@ MAC_BIN = ssv6060_mac.hex
 CONTIKI_PROJECT=ssv6060-main
 CONTIKI_SRC += $(CONTIKI_PROJECT).c \
 			   mphal.c \
+			   flash.c \
+			   modutime.c \
+			   moduos.c \
+			   modumachine.c \
 			   gccollect.c \
 			   lib/mp-readline/readline.c \
+			   lib/timeutils/timeutils.c \
 			   lib/utils/pyexec.c \
 			   lib/utils/pyhelp.c \
+			   lib/fatfs/ff.c \
+			   lib/fatfs/option/ccsbcs.c \
 
 CONTIKI_SRC += $(wildcard contikilib/*.c) 
 CONTIKI_SRC += $(wildcard icomapps/*.c) 
@@ -45,7 +52,7 @@ OBJDUMP  = $(CROSS)objdump
 OPTFLAGS   = -Os -fomit-frame-pointer -std=gnu99
 INCLUDE    = -I./icomlib/include -I./icomlib/include/net -I./icomlib/include/bsp -I./icomlib/include/net/ieee80211_bss -I./icomlib/include/sys -I./icomlib/include/net/mac -I./icomlib/include/dev  -I./icomlib/include/matrixssl -I./include
 
-INCLUDE   += -I. -I.. -I$(BUILD) -I../lib/mp-readline -I../lib/utils
+INCLUDE   += -I. -I.. -I$(BUILD) -I../lib/mp-readline -I../lib/utils -I../lib/timeutils -I../lib/timeutils
 
 CPPFLAGS  += $(INCLUDE) $(OPTFLAGS) $(DBGFLAGS)
 ARCH_FLAGS = -march=armv3m -mno-thumb-interwork 
@@ -60,6 +67,9 @@ LDFLAGS += -Xlinker -M -Xlinker -Map=contiki-$(TARGET).map -nostartfiles $(CRT0)
 #LDFLAGS += -Wl,--gc-sections
 
 AROPTS = rcf
+
+SRC_QSTR += $(CONTIKI_SRC)
+SRC_QSTR_AUTO_DEPS =
 
 CLEAN += %.elf $(CONTIKI_PROJECT).elf
 

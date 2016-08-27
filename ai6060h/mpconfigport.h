@@ -10,6 +10,7 @@
 #define MICROPY_COMP_DOUBLE_TUPLE_ASSIGN    (0)
 #define MICROPY_COMP_TRIPLE_TUPLE_ASSIGN    (0)
 #define MICROPY_MEM_STATS                   (0)
+#define MICROPY_MODULE_WEAK_LINKS           (1)
 #define MICROPY_ENABLE_GC                   (1)
 #define MICROPY_HELPER_REPL                 (1)
 #define MICROPY_ENABLE_COMPILER             (1)
@@ -30,7 +31,7 @@
 
 #define MICROPY_PY_GC                       (1)
 #define MICROPY_PY_ARRAY                    (0)
-#define MICROPY_PY_ATTRTUPLE                (0)
+#define MICROPY_PY_ATTRTUPLE                (1)
 #define MICROPY_PY_COLLECTIONS              (0)
 #define MICROPY_PY_MATH                     (0)
 #define MICROPY_PY_CMATH                    (0)
@@ -40,6 +41,13 @@
 #define MICROPY_CPYTHON_COMPAT              (0)
 #define MICROPY_LONGINT_IMPL                (MICROPY_LONGINT_IMPL_NONE)
 #define MICROPY_FLOAT_IMPL                  (MICROPY_FLOAT_IMPL_FLOAT)
+
+#define MICROPY_FSUSERMOUNT                     (1)  
+#define MICROPY_FATFS_ENABLE_LFN                (1)
+#define MICROPY_FATFS_LFN_CODE_PAGE             (437) /* 1=SFN/ANSI 437=LFN/U.S.(OEM) */
+#define MICROPY_FATFS_VOLUMES                   (4)
+#define MICROPY_FATFS_RPATH                     (2)
+#define MICROPY_FATFS_MAX_SS                    (4096)
 
 #define AI6060H_CONSOLE_UART_PORT           (SSV6XXX_UART0)
 #define MICROPY_HW_BOARD_NAME               "AI6060H"
@@ -65,6 +73,20 @@ typedef long mp_off_t;
 extern const struct _mp_obj_fun_builtin_t mp_builtin_open_obj;
 #define MICROPY_PORT_BUILTINS \
     { MP_OBJ_NEW_QSTR(MP_QSTR_open), (mp_obj_t)&mp_builtin_open_obj },
+
+extern const struct _mp_obj_module_t mp_module_utime;
+extern const struct _mp_obj_module_t mp_module_uos;
+extern const struct _mp_obj_module_t mp_module_umachine;
+
+#define MICROPY_PORT_BUILTIN_MODULES \
+    { MP_OBJ_NEW_QSTR(MP_QSTR_utime),     (mp_obj_t)&mp_module_utime },     \
+    { MP_OBJ_NEW_QSTR(MP_QSTR_uos),       (mp_obj_t)&mp_module_uos },       \
+    { MP_OBJ_NEW_QSTR(MP_QSTR_umachine),  (mp_obj_t)&mp_module_umachine },  \
+
+#define MICROPY_PORT_BUILTIN_MODULE_WEAK_LINKS \
+    { MP_OBJ_NEW_QSTR(MP_QSTR_time),     (mp_obj_t)&mp_module_utime },     \
+    { MP_OBJ_NEW_QSTR(MP_QSTR_os),       (mp_obj_t)&mp_module_uos },       \
+    { MP_OBJ_NEW_QSTR(MP_QSTR_machine),  (mp_obj_t)&mp_module_umachine },  \
 
 #define MP_STATE_PORT MP_STATE_VM
 #define MICROPY_PORT_ROOT_POINTERS                                        \
