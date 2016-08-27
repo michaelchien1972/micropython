@@ -34,10 +34,32 @@
 #include "py/mphal.h"
 
 #include "flash.h"
+#include "wdt.h"
+#include "pin.h"
+#include "timer.h"
+
+#include "irq.h"
+
+STATIC mp_obj_t machine_irq_en(void) {
+    irq_enable();
+    return mp_const_none;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_0(machine_irq_en_obj, machine_irq_en);
+
+STATIC mp_obj_t machine_irq_dis(void) {
+    irq_disable();
+    return mp_const_none;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_0(machine_irq_dis_obj, machine_irq_dis);
 
 STATIC const mp_map_elem_t machine_module_globals_table[] = {
-    { MP_OBJ_NEW_QSTR(MP_QSTR___name__),      MP_OBJ_NEW_QSTR(MP_QSTR_umachine) },
-    { MP_OBJ_NEW_QSTR(MP_QSTR_FLASH),         (mp_obj_t)&flash_type },
+    { MP_OBJ_NEW_QSTR(MP_QSTR___name__), MP_OBJ_NEW_QSTR(MP_QSTR_umachine) },
+    { MP_OBJ_NEW_QSTR(MP_QSTR_irq_en),   (mp_obj_t)&machine_irq_en_obj },
+    { MP_OBJ_NEW_QSTR(MP_QSTR_irq_dis),  (mp_obj_t)&machine_irq_dis_obj },
+    { MP_OBJ_NEW_QSTR(MP_QSTR_Pin),      (mp_obj_t)&pin_type },
+    { MP_OBJ_NEW_QSTR(MP_QSTR_Timer),    (mp_obj_t)&timer_type },
+    { MP_OBJ_NEW_QSTR(MP_QSTR_FLASH),    (mp_obj_t)&flash_type },
+    { MP_OBJ_NEW_QSTR(MP_QSTR_WDT),      (mp_obj_t)&wdt_type },
 };
 STATIC MP_DEFINE_CONST_DICT(machine_module_globals, machine_module_globals_table);
 

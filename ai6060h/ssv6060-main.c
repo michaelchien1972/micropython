@@ -130,17 +130,15 @@ int mp_main (void) {
     mp_obj_list_init(mp_sys_path, 0);
     mp_obj_list_init(mp_sys_argv, 0);
     mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR_));
-
     clock_init();
+    irq_init();
+    hwtmr_init();
     mphal_init();
     readline_init0();
     mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR__slash_flash));
     mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR__slash_flash_slash_lib));
     mp_hal_stdout_tx_strn_cooked(msg_0, strlen(msg_0));
-
     flash_vfs_init0();
-    process_init();
-
     for(;;) {
         if(pyexec_friendly_repl() != 0) {
             mp_hal_stdout_tx_strn_cooked(msg_1, strlen(msg_1));

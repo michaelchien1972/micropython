@@ -14,6 +14,9 @@ CONTIKI_PROJECT=ssv6060-main
 CONTIKI_SRC += $(CONTIKI_PROJECT).c \
 			   mphal.c \
 			   flash.c \
+			   wdt.c \
+			   timer.c \
+			   pin.c \
 			   modutime.c \
 			   moduos.c \
 			   modumachine.c \
