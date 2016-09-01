@@ -40,6 +40,12 @@
 
 #include "irq.h"
 
+STATIC mp_obj_t machine_reset(void) {
+    api_wdog_reboot();
+    return mp_const_none;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_0(machine_reset_obj, machine_reset);
+
 STATIC mp_obj_t machine_irq_en(void) {
     irq_enable();
     return mp_const_none;
@@ -54,6 +60,7 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_0(machine_irq_dis_obj, machine_irq_dis);
 
 STATIC const mp_map_elem_t machine_module_globals_table[] = {
     { MP_OBJ_NEW_QSTR(MP_QSTR___name__), MP_OBJ_NEW_QSTR(MP_QSTR_umachine) },
+    { MP_OBJ_NEW_QSTR(MP_QSTR_reset),   (mp_obj_t)&machine_reset_obj },
     { MP_OBJ_NEW_QSTR(MP_QSTR_irq_en),   (mp_obj_t)&machine_irq_en_obj },
     { MP_OBJ_NEW_QSTR(MP_QSTR_irq_dis),  (mp_obj_t)&machine_irq_dis_obj },
     { MP_OBJ_NEW_QSTR(MP_QSTR_Pin),      (mp_obj_t)&pin_type },

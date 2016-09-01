@@ -141,7 +141,7 @@ int mp_main (void) {
     flash_vfs_init0();
     for(;;) {
         if(pyexec_friendly_repl() != 0) {
-            mp_hal_stdout_tx_strn_cooked(msg_1, strlen(msg_1));
+            api_wdog_reboot();
         }
     }
     return 0;
