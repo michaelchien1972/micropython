@@ -27,7 +27,7 @@
 
 #include "pin.h"
 
-pin_obj_t pin_obj[GPIO_MAX] = {
+STATIC pin_obj_t pin_obj[GPIO_MAX] = {
     {{&pin_type}, GPIO_1,  {OUTPUT, GPIO_PULL_NONE, GPIO_DRIVE_DISABLE}, 0},
     {{&pin_type}, GPIO_2,  {OUTPUT, GPIO_PULL_NONE, GPIO_DRIVE_DISABLE}, 0},
     {{&pin_type}, GPIO_3,  {OUTPUT, GPIO_PULL_NONE, GPIO_DRIVE_DISABLE}, 0},
@@ -131,6 +131,18 @@ STATIC mp_obj_t pin_value(mp_uint_t n_args, const mp_obj_t *args) {
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(pin_value_obj, 1, 2, pin_value);
 
+//TODO( not complete)
+STATIC mp_obj_t pin_toggle(mp_obj_t self_in) {
+    pin_obj_t *self = self_in;
+
+    self->value ^= 1;
+
+    mp_obj_t value = self->value ? mp_const_true:mp_const_false;
+
+    return pin_call(self, 1, 0, value);
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_1(pin_toggle_obj, pin_toggle);
+
 STATIC const mp_map_elem_t pin_locals_dict_table[] = {
 #if 0
     // instance methods
@@ -144,6 +156,7 @@ STATIC const mp_map_elem_t pin_locals_dict_table[] = {
 #endif
 
     { MP_OBJ_NEW_QSTR(MP_QSTR_value),          (mp_obj_t)&pin_value_obj },
+    { MP_OBJ_NEW_QSTR(MP_QSTR_toggle),         (mp_obj_t)&pin_toggle_obj },
 
     // class constants
     { MP_OBJ_NEW_QSTR(MP_QSTR_IN),             MP_OBJ_NEW_SMALL_INT(INPUT) },
