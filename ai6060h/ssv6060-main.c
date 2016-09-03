@@ -48,6 +48,7 @@
 
 
 #include "sys/clock.h"
+#include "sys/autostart.h"
 
 #include "mphal.h"
 #include "gccollect.h"
@@ -71,26 +72,6 @@ at_cmd_info atcmd_info_tbl[] =
 {
     {"",    NULL}
 };
-/*---------------------------------------------------------------------------*/
-int SetLED (uint8_t nEnable)
-{
-	GPIO_CONF conf;
-
-   conf.dirt = OUTPUT;
-   conf.driving_en = 0;
-   conf.pull_en = 0;
-   
-   pinMode(GPIO_1, conf);
-	if(nEnable == 0)
-	{
-		digitalWrite(GPIO_1, 0);
-	}
-	else
-	{
-		digitalWrite(GPIO_1, 1);
-	}
-	return ERROR_SUCCESS;
-}
 
 void flash_vfs_init0 (void) {
     fs_user_mount_t *vfs = &fs_user_mount_flash;
@@ -124,6 +105,18 @@ void flash_vfs_init0 (void) {
     }
 }
 
+PROCESS(main_process, "main process");
+AUTOSTART_PROCESSES(&main_process);
+PROCESS_THREAD(main_process, ev, data)
+{
+    PROCESS_BEGIN();
+
+    if(pyexec_friendly_repl() != 0) {
+        api_wdog_reboot();
+    }
+    PROCESS_END();
+}
+
 int mp_main (void) {
     gc_init(&__heap_start__, &__heap_end__);
     mp_init();
@@ -139,10 +132,13 @@ int mp_main (void) {
     mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR__slash_flash_slash_lib));
     mp_hal_stdout_tx_strn_cooked(msg_0, strlen(msg_0));
     flash_vfs_init0();
+    netstack_init();
+    process_init();
+    process_start(&etimer_process, NULL);
+    autostart_start(autostart_processes);
     for(;;) {
-        if(pyexec_friendly_repl() != 0) {
-            api_wdog_reboot();
-        }
+        do {
+        } while(process_run() > 0);
     }
     return 0;
 }
@@ -150,10 +146,6 @@ int mp_main (void) {
 
 bool gDisableRTS = 0;
 int i_config = 0;
-
-void nlr_jump_fail(void *val) { 
-    printf("NLR failed\r\n");
-}
 
 mp_import_stat_t mp_import_stat(const char *path) {
     return fat_vfs_import_stat(path);
