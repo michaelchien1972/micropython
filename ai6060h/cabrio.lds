@@ -1,55 +1,50 @@
 
 MEMORY
 {
-        flash          (rx)   : ORIGIN = 0x3000000, LENGTH = 512K
-        ram           (rwx)   : ORIGIN = 0x2000000, LENGTH = 192K
+    flash (rx)  : ORIGIN = 0x3000000, LENGTH = 512K
+    ram   (rwx) : ORIGIN = 0x2000000, LENGTH = 192K
 }
 
-/*__stack_end__ = 0x02000000 + 160K - 4;*/
-_flash_size_ = LENGTH(flash); 
-_ram_size_ = LENGTH(ram); 
-__stack_end__ = ORIGIN(ram)+ LENGTH(ram) - 4;
-_boot_size = 0x4000;	/*8KB:boot 4KB: wifi-config 4KB:feature_config*/
+_flash_size_    = LENGTH(flash); 
+_ram_size_      = LENGTH(ram); 
+__stack_end__   = ORIGIN(ram) + LENGTH(ram) - 4;
+_boot_size      = 0x4000;	/*8KB:boot 4KB: wifi-config 4KB:feature_config*/
 
 SECTIONS
 {
-/*        . = 0x3000000;*/
-        . = ORIGIN(flash);
-
+    . = ORIGIN(flash);
 	_sitxt0 = .;
-        startup : AT(_sitxt0)
-        {
+    startup : AT(_sitxt0)
+    {
         *(.startup1)
         *(.startup2)
-/*		icomlib.a:boot-hiflying.o (.text .rodata .rodata*) */
 		. = ALIGN(16);
-        } > flash
+    } > flash
 
-		_vma_boot_text_beg = ORIGIN(ram) + LENGTH(ram) - 28K;
-		_sitxt0a = _sitxt0 + SIZEOF(startup); 
+    _vma_boot_text_beg = ORIGIN(ram) + LENGTH(ram) - 28K;
+    _sitxt0a = _sitxt0 + SIZEOF(startup); 
 
 
     . = ORIGIN(flash) + _boot_size;
 	_sitxt2 = .;
 
     prog_in_flash _sitxt2 : AT( _sitxt2)
-        {
-				*(.vars_second_boot)
-				icomlib.a:contiki-main.o (.text.startup.main )
-/* *(.text*) *(.rodata) *(.rodata*) */
-				*(EXCLUDE_FILE (icomlib.a:boot-hiflying.o icomlib.a:AES_decrypt.o contikilib.a:uip.o icomlib.a:timer.o icomlib.a:clock.o icomlib.a:etimer.o contikilib.a:tcpip.o icomlib.a:ieee80211_net.o icomlib.a:ieee80211_rdc.o icomlib.a:packetbuf.o icomlib.a:drv_pktbuf.o icomlib.a:ssvradio.o icomlib.a:ssv6200_rx.o icomlib.a:ssv6200_tx.o icomlib.a:throughput.o icomlib.a:rate_control.o icomlib.a:dbg-printf.o icomlib.a:strformat.o icomlib.a:dbg-puts.o  icomlib.a:debug-uart.o icomlib.a:soft_ap.o icomlib.a:xmem.o icomlib.a:drv_flash.o icomlib.a:flash_api.o icomlib.a:hw_regs_api.o icomlib.a:powersave.o contikilib.a:socket_driver.o icomlib.a:pstm.o icomlib.a:pstmmonreduce.o icomlib.a:pstmmulcomba.o icomlib.a:pstmsqrcomba.o icomlib.a:asn1.o icomlib.a:x905.o icomlib.a:sha512.o icomlib.a:sha384.o icomlib.a:sha256.o icomlib.a:ssv_lib.o) .text* )
-				*(EXCLUDE_FILE (icomlib.a:boot-hiflying.o icomlib.a:AES_decrypt.o contikilib.a:uip.o icomlib.a:timer.o icomlib.a:clock.o icomlib.a:etimer.o contikilib.a:tcpip.o icomlib.a:ieee80211_net.o icomlib.a:ieee80211_rdc.o icomlib.a:packetbuf.o icomlib.a:drv_pktbuf.o icomlib.a:ssvradio.o icomlib.a:ssv6200_rx.o icomlib.a:ssv6200_tx.o icomlib.a:throughput.o icomlib.a:rate_control.o icomlib.a:dbg-printf.o icomlib.a:strformat.o icomlib.a:dbg-puts.o  icomlib.a:debug-uart.o icomlib.a:soft_ap.o icomlib.a:xmem.o icomlib.a:drv_flash.o icomlib.a:flash_api.o icomlib.a:hw_regs_api.o icomlib.a:powersave.o contikilib.a:socket_driver.o icomlib.a:pstm.o icomlib.a:pstmmonreduce.o icomlib.a:pstmmulcomba.o icomlib.a:pstmsqrcomba.o icomlib.a:asn1.o icomlib.a:x905.o icomlib.a:sha512.o icomlib.a:sha384.o icomlib.a:sha256.o icomlib.a:ssv_lib.o) .text.* )
-				*(EXCLUDE_FILE (icomlib.a:boot-hiflying.o icomlib.a:AES_decrypt.o contikilib.a:uip.o icomlib.a:timer.o icomlib.a:clock.o icomlib.a:etimer.o contikilib.a:tcpip.o icomlib.a:ieee80211_net.o icomlib.a:ieee80211_rdc.o icomlib.a:packetbuf.o icomlib.a:drv_pktbuf.o icomlib.a:ssvradio.o icomlib.a:ssv6200_rx.o icomlib.a:ssv6200_tx.o icomlib.a:throughput.o icomlib.a:rate_control.o icomlib.a:dbg-printf.o icomlib.a:strformat.o icomlib.a:dbg-puts.o  icomlib.a:debug-uart.o icomlib.a:soft_ap.o icomlib.a:xmem.o icomlib.a:drv_flash.o icomlib.a:flash_api.o icomlib.a:hw_regs_api.o icomlib.a:powersave.o contikilib.a:socket_driver.o icomlib.a:pstm.o icomlib.a:pstmmonreduce.o icomlib.a:pstmmulcomba.o icomlib.a:pstmsqrcomba.o icomlib.a:asn1.o icomlib.a:x905.o icomlib.a:sha512.o icomlib.a:sha384.o icomlib.a:sha256.o icomlib.a:ssv_lib.o) .rodata )
-				*(EXCLUDE_FILE (icomlib.a:boot-hiflying.o icomlib.a:AES_decrypt.o contikilib.a:uip.o icomlib.a:timer.o icomlib.a:clock.o icomlib.a:etimer.o contikilib.a:tcpip.o icomlib.a:ieee80211_net.o icomlib.a:ieee80211_rdc.o icomlib.a:packetbuf.o icomlib.a:drv_pktbuf.o icomlib.a:ssvradio.o icomlib.a:ssv6200_rx.o icomlib.a:ssv6200_tx.o icomlib.a:throughput.o icomlib.a:rate_control.o icomlib.a:dbg-printf.o icomlib.a:strformat.o icomlib.a:dbg-puts.o  icomlib.a:debug-uart.o icomlib.a:soft_ap.o icomlib.a:xmem.o icomlib.a:drv_flash.o icomlib.a:flash_api.o icomlib.a:hw_regs_api.o icomlib.a:powersave.o contikilib.a:socket_driver.o icomlib.a:pstm.o icomlib.a:pstmmonreduce.o icomlib.a:pstmmulcomba.o icomlib.a:pstmsqrcomba.o icomlib.a:asn1.o icomlib.a:x905.o icomlib.a:sha512.o icomlib.a:sha384.o icomlib.a:sha256.o icomlib.a:ssv_lib.o) .rodata* )
-                *(.glue_7)
-                *(.glue_7t)
-                *(.ARM.extab)
-				*(.gnu.linkonce.armextab.*)
-                *(.vfp11_veneer)
-                *(.v4_bx)
-                *(.iplt)
-                *(.rel.dyn)
-                *(.rel.iplt)
+    {
+        *(.vars_second_boot)
+        icomlib.a:contiki-main.o (.text.startup.main )
+        *(EXCLUDE_FILE (icomlib.a:boot-hiflying.o icomlib.a:AES_decrypt.o contikilib.a:uip.o icomlib.a:timer.o icomlib.a:clock.o icomlib.a:etimer.o contikilib.a:tcpip.o icomlib.a:ieee80211_net.o icomlib.a:ieee80211_rdc.o icomlib.a:packetbuf.o icomlib.a:drv_pktbuf.o icomlib.a:ssvradio.o icomlib.a:ssv6200_rx.o icomlib.a:ssv6200_tx.o icomlib.a:throughput.o icomlib.a:rate_control.o icomlib.a:dbg-printf.o icomlib.a:strformat.o icomlib.a:dbg-puts.o  icomlib.a:debug-uart.o icomlib.a:soft_ap.o icomlib.a:xmem.o icomlib.a:drv_flash.o icomlib.a:flash_api.o icomlib.a:hw_regs_api.o icomlib.a:powersave.o contikilib.a:socket_driver.o icomlib.a:pstm.o icomlib.a:pstmmonreduce.o icomlib.a:pstmmulcomba.o icomlib.a:pstmsqrcomba.o icomlib.a:asn1.o icomlib.a:x905.o icomlib.a:sha512.o icomlib.a:sha384.o icomlib.a:sha256.o icomlib.a:ssv_lib.o) .text* )
+        *(EXCLUDE_FILE (icomlib.a:boot-hiflying.o icomlib.a:AES_decrypt.o contikilib.a:uip.o icomlib.a:timer.o icomlib.a:clock.o icomlib.a:etimer.o contikilib.a:tcpip.o icomlib.a:ieee80211_net.o icomlib.a:ieee80211_rdc.o icomlib.a:packetbuf.o icomlib.a:drv_pktbuf.o icomlib.a:ssvradio.o icomlib.a:ssv6200_rx.o icomlib.a:ssv6200_tx.o icomlib.a:throughput.o icomlib.a:rate_control.o icomlib.a:dbg-printf.o icomlib.a:strformat.o icomlib.a:dbg-puts.o  icomlib.a:debug-uart.o icomlib.a:soft_ap.o icomlib.a:xmem.o icomlib.a:drv_flash.o icomlib.a:flash_api.o icomlib.a:hw_regs_api.o icomlib.a:powersave.o contikilib.a:socket_driver.o icomlib.a:pstm.o icomlib.a:pstmmonreduce.o icomlib.a:pstmmulcomba.o icomlib.a:pstmsqrcomba.o icomlib.a:asn1.o icomlib.a:x905.o icomlib.a:sha512.o icomlib.a:sha384.o icomlib.a:sha256.o icomlib.a:ssv_lib.o) .text.* )
+        *(EXCLUDE_FILE (icomlib.a:boot-hiflying.o icomlib.a:AES_decrypt.o contikilib.a:uip.o icomlib.a:timer.o icomlib.a:clock.o icomlib.a:etimer.o contikilib.a:tcpip.o icomlib.a:ieee80211_net.o icomlib.a:ieee80211_rdc.o icomlib.a:packetbuf.o icomlib.a:drv_pktbuf.o icomlib.a:ssvradio.o icomlib.a:ssv6200_rx.o icomlib.a:ssv6200_tx.o icomlib.a:throughput.o icomlib.a:rate_control.o icomlib.a:dbg-printf.o icomlib.a:strformat.o icomlib.a:dbg-puts.o  icomlib.a:debug-uart.o icomlib.a:soft_ap.o icomlib.a:xmem.o icomlib.a:drv_flash.o icomlib.a:flash_api.o icomlib.a:hw_regs_api.o icomlib.a:powersave.o contikilib.a:socket_driver.o icomlib.a:pstm.o icomlib.a:pstmmonreduce.o icomlib.a:pstmmulcomba.o icomlib.a:pstmsqrcomba.o icomlib.a:asn1.o icomlib.a:x905.o icomlib.a:sha512.o icomlib.a:sha384.o icomlib.a:sha256.o icomlib.a:ssv_lib.o) .rodata )
+        *(EXCLUDE_FILE (icomlib.a:boot-hiflying.o icomlib.a:AES_decrypt.o contikilib.a:uip.o icomlib.a:timer.o icomlib.a:clock.o icomlib.a:etimer.o contikilib.a:tcpip.o icomlib.a:ieee80211_net.o icomlib.a:ieee80211_rdc.o icomlib.a:packetbuf.o icomlib.a:drv_pktbuf.o icomlib.a:ssvradio.o icomlib.a:ssv6200_rx.o icomlib.a:ssv6200_tx.o icomlib.a:throughput.o icomlib.a:rate_control.o icomlib.a:dbg-printf.o icomlib.a:strformat.o icomlib.a:dbg-puts.o  icomlib.a:debug-uart.o icomlib.a:soft_ap.o icomlib.a:xmem.o icomlib.a:drv_flash.o icomlib.a:flash_api.o icomlib.a:hw_regs_api.o icomlib.a:powersave.o contikilib.a:socket_driver.o icomlib.a:pstm.o icomlib.a:pstmmonreduce.o icomlib.a:pstmmulcomba.o icomlib.a:pstmsqrcomba.o icomlib.a:asn1.o icomlib.a:x905.o icomlib.a:sha512.o icomlib.a:sha384.o icomlib.a:sha256.o icomlib.a:ssv_lib.o) .rodata* )
+        *(.glue_7)
+        *(.glue_7t)
+        *(.ARM.extab)
+		*(.gnu.linkonce.armextab.*)
+        *(.vfp11_veneer)
+        *(.v4_bx)
+        *(.iplt)
+        *(.rel.dyn)
+        *(.rel.iplt)
 /*		*(ARM.attributes) */
 /* 		*(.ARM.attributes) */
 		. = ALIGN(4);
@@ -95,19 +90,19 @@ SECTIONS
 			icomlib.a:sha384.o (.text .text* .rodata .rodata*)
 			icomlib.a:sha256.o (.text .text* .rodata .rodata*)
 			icomlib.a:ssv_lib.o (.text .text* .rodata .rodata*)
-   		*(.text.process_thread*)
+   		    *(.text.process_thread*)
             . = ALIGN(4);
 		} > ram
 
 
-  _tbeg_dst = ORIGIN(ram); 
+        _tbeg_dst = ORIGIN(ram); 
 	
 
 		_sitxt3 = LOADADDR(prog_in_flash) + SIZEOF(prog_in_flash);
 
 
-	_tbeg_src = LOADADDR(prog_in_sram);
-	_tend_dst = _tbeg_dst + SIZEOF(prog_in_sram);
+	    _tbeg_src = LOADADDR(prog_in_sram);
+	    _tend_dst = _tbeg_dst + SIZEOF(prog_in_sram);
 
 
 /*
@@ -115,45 +110,46 @@ SECTIONS
 	loaded at [000xxxx,0001xxxxx] overlaps section .data loaded at [000xxxxx,000xxxxx]"
 */
 
-	.ARM : 
-	{
-		*(.ARM.exidx*)	
-		_tend_dst = .;
-	} > ram
+        .ARM : 
+        {
+            *(.ARM.exidx*)	
+            _tend_dst = .;
+        } > ram
 
         .data : 
         {
-		_dbeg_dst = .;
-		*(EXCLUDE_FILE (icomlib.a:boot-hiflying.o) .data)
-		*(EXCLUDE_FILE (icomlib.a:boot-hiflying.o) .data*) _dend_dst = .; 
+            _dbeg_dst = .;
+            *(EXCLUDE_FILE (icomlib.a:boot-hiflying.o) .data)
+            *(EXCLUDE_FILE (icomlib.a:boot-hiflying.o) .data*) _dend_dst = .; 
 		} >ram 
+
 		_dbeg_src = LOADADDR(.data);
 
 
         .bss ALIGN(16):
         {
          	. = ALIGN(16);
-                __bss_beg__ = .;
-				*(EXCLUDE_FILE (icomlib.a:boot-hiflying.o) .bss )
-				*(EXCLUDE_FILE (icomlib.a:boot-hiflying.o) .bss*)
-				*(EXCLUDE_FILE (icomlib.a:boot-hiflying.o) COMMON)
-        		__bss_end__ = . ;
-                . = ALIGN(16);
+            __bss_beg__ = .;
+            *(EXCLUDE_FILE (icomlib.a:boot-hiflying.o) .bss )
+            *(EXCLUDE_FILE (icomlib.a:boot-hiflying.o) .bss*)
+            *(EXCLUDE_FILE (icomlib.a:boot-hiflying.o) COMMON)
+            __bss_end__ = . ;
+            . = ALIGN(16);
         } >ram
 
 
-	_btext_beg_src = LOADADDR(boot_in_sram);
-	_btext_beg_dst = _vma_boot_text_beg; 
-	_btext_end_dst =  _btext_beg_dst + SIZEOF(boot_in_sram);
+        _btext_beg_src = LOADADDR(boot_in_sram);
+        _btext_beg_dst = _vma_boot_text_beg; 
+        _btext_end_dst =  _btext_beg_dst + SIZEOF(boot_in_sram);
 
 		boot_in_sram _vma_boot_text_beg : AT(_sitxt0a)
         {
             . = ALIGN(4);
-/*		icomlib.a:boot-hiflying.o (.text .text.* .rodata .rodata*) */
-		icomlib.a:boot-hiflying.o (.text )
-		icomlib.a:boot-hiflying.o (.text.* )
-		icomlib.a:boot-hiflying.o (.rodata )
-		icomlib.a:boot-hiflying.o (.rodata* )
+    /*		icomlib.a:boot-hiflying.o (.text .text.* .rodata .rodata*) */
+		    icomlib.a:boot-hiflying.o (.text )
+		    icomlib.a:boot-hiflying.o (.text.* )
+		    icomlib.a:boot-hiflying.o (.rodata )
+		    icomlib.a:boot-hiflying.o (.rodata* )
             . = ALIGN(4);
 		} > ram
 
@@ -163,7 +159,6 @@ SECTIONS
 /*		_vma_boot_data_beg = 0x2000000 + 160K - 16K;  */ 
 		_vma_boot_data_beg = ORIGIN(ram) + LENGTH(ram) - 16K;
 
-
         .boot_data _vma_boot_data_beg : AT( _sitxt1) 
         {
 			_boot_dbeg_dst = .;
@@ -171,6 +166,7 @@ SECTIONS
 			. = ALIGN(16);
 			_boot_dend_dst = .;
         } >ram
+
 		_boot_dbeg_src = LOADADDR(.boot_data);
 
 		_vma_boot_bss_beg =_vma_boot_data_beg - 16K;   
@@ -202,7 +198,7 @@ SECTIONS
 
         _end = .;
 
-		 __end__ = . ;
+		__end__ = . ;
 
 
 /*TOTAL_STACK_SIZE comes from boot.s*/
