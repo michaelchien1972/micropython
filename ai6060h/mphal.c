@@ -35,26 +35,42 @@
 
 #include "mphal.h"
 
-STATIC byte input_buf_array[256];
-ringbuf_t input_buf = {input_buf_array, sizeof(input_buf_array)};
+#include "irq.h"
+
+#define BUFFRING_LEN 256
+
+byte input_buf_array[BUFFRING_LEN];
+ringbuf_t input_buf = {input_buf_array, BUFFRING_LEN};
+int interrupt_char;
+
+irq_handler rx_irq_handler(void *arg) {
+    byte c = drv_uart_rx(AI6060H_CONSOLE_UART_PORT);
+    //printf("c = %d\r\n", c);
+    if (c == interrupt_char) {
+        //TODO(not support yet)
+        //mp_keyboard_interrupt();
+    }
+    else
+        ringbuf_put(&input_buf, c);
+}
 
 void mphal_init(void) {
     drv_uart_init(AI6060H_CONSOLE_UART_PORT);
 
     // Need to this function to calibrate clock..
-    drv_uart_26M();
+    drv_uart_40M();
+
+    irq_request(IRQ_UART0_RX, rx_irq_handler, NULL);
 }
 
 int mp_hal_stdin_rx_chr(void) {
+    int c = 0;
     for (;;) {
-#if 0
-        int c = ringbuf_get(&input_buf);
-#else
-        int c = drv_uart_rx(AI6060H_CONSOLE_UART_PORT);
-#endif
+        c = ringbuf_get(&input_buf);
         if (c != -1) {
             return c;
         }
+        ssv_delay(1000);
     }
 }
 

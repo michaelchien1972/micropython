@@ -20,6 +20,7 @@ CONTIKI_SRC += $(CONTIKI_PROJECT).c \
 			   modutime.c \
 			   moduos.c \
 			   modumachine.c \
+			   moduwireless.c \
 			   gccollect.c \
 			   lib/mp-readline/readline.c \
 			   lib/timeutils/timeutils.c \

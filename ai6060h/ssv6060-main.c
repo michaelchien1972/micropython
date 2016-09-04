@@ -59,6 +59,8 @@
 #include "atcmd.h"
 #include "bsp.h"
 #include "hw_init.h"
+#include "wdog_api.h"
+#include "netstack.h"
 
 const char *msg_0 = "Starting to execute main.py\r\n";
 const char *msg_1 = "REPL start failed\r\n";
@@ -105,6 +107,18 @@ void flash_vfs_init0 (void) {
     }
 }
 
+COMMON_CONFIG i_config;
+
+char gDisableRTS = 0;
+
+PROCESS_NAME(ssv6200_radio_receive_process);
+PROCESS_NAME(temperature_compensator_process);
+PROCESS_NAME(tcp_driver_process);
+PROCESS_NAME(udp_driver_process);
+PROCESS_NAME(dhcp_process);
+PROCESS_NAME(resolv_process);
+PROCESS_NAME(discover_process);
+
 PROCESS(main_process, "main process");
 AUTOSTART_PROCESSES(&main_process);
 PROCESS_THREAD(main_process, ev, data)
@@ -118,34 +132,58 @@ PROCESS_THREAD(main_process, ev, data)
 }
 
 int mp_main (void) {
+    //set_log_single_group_level(11,1,2);
+    memcpy(&i_config, 0x3003000, sizeof(COMMON_CONFIG));
+    bsp_init();
+    clock_init();
+    soft_mac_init();
+    NETSTACK_CONF_RADIO.init();
+    // Due to console_init would register a callback to icomlib tx handler which is not what I want, so I do the console_init in mphal_init
+    //console_init(NULL);
+    mphal_init();
+    cabrio_flash_init();
+    reset_global_conf();
+    bsp_get_boot_info(true);
+    bsp_get_define_info(true);
+    bsp_get_mp_info(true);
+    bsp_get_config_info(true, &i_config);
+    softap_init();
     gc_init(&__heap_start__, &__heap_end__);
     mp_init();
     mp_obj_list_init(mp_sys_path, 0);
     mp_obj_list_init(mp_sys_argv, 0);
     mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR_));
-    clock_init();
-    irq_init();
-    hwtmr_init();
-    mphal_init();
-    readline_init0();
     mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR__slash_flash));
     mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR__slash_flash_slash_lib));
+
+    //irq_init();
+
+    //hwtmr_init();
+    readline_init0();
     mp_hal_stdout_tx_strn_cooked(msg_0, strlen(msg_0));
     flash_vfs_init0();
-    netstack_init();
+
     process_init();
     process_start(&etimer_process, NULL);
+    init_global_conf();
+    process_start(&ssv6200_radio_receive_process, NULL);
+    process_start(&tcpip_process, NULL);
+    process_start(&tcp_driver_process, NULL);
+    process_start(&udp_driver_process, NULL);
+    irq_enable();
+    netstack_init();
+    process_start(&dhcp_process, NULL);
+    process_start(&temperature_compensator_process, NULL);
     autostart_start(autostart_processes);
+    process_start(&resolv_process, NULL);
+    process_start(&discover_process, NULL);
     for(;;) {
         do {
-        } while(process_run() > 0);
+        } while (process_run() > 0);
     }
     return 0;
+
 }
-
-
-bool gDisableRTS = 0;
-int i_config = 0;
 
 mp_import_stat_t mp_import_stat(const char *path) {
     return fat_vfs_import_stat(path);
