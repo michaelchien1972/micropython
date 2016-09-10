@@ -30,7 +30,6 @@ os/random.c \
 os/timer.c
 
 PLATFORM_SRC = \
-platform/airkiss.c \
 platform/atcmd_icomm.c \
 platform/boot-hiflying.c \
 platform/bsp_info.c \

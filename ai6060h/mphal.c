@@ -36,6 +36,7 @@
 #include "mphal.h"
 
 #include "irq.h"
+#include "contiki.h"
 
 #define BUFFRING_LEN 256
 
@@ -44,14 +45,37 @@ ringbuf_t input_buf = {input_buf_array, BUFFRING_LEN};
 int interrupt_char;
 
 irq_handler rx_irq_handler(void *arg) {
+    int ret = 0;
     byte c = drv_uart_rx(AI6060H_CONSOLE_UART_PORT);
-    //printf("c = %d\r\n", c);
     if (c == interrupt_char) {
         //TODO(not support yet)
         //mp_keyboard_interrupt();
     }
     else
         ringbuf_put(&input_buf, c);
+
+}
+
+PROCESS(os_repl_process, "repl");
+PROCESS_THREAD(os_repl_process, ev, data)
+{
+    PROCESS_BEGIN();
+#if MICROPY_REPL_EVENT_DRIVEN
+    int c, ret;
+    for (;;) {
+        PROCESS_PAUSE();
+        c = ringbuf_get(&input_buf);
+        if (c == interrupt_char) {
+            //TODO(not support yet)
+            //mp_keyboard_interrupt();
+        }
+        ret = pyexec_event_repl_process_char(c);
+        if (ret & PYEXEC_FORCED_EXIT) {
+            api_wdog_reboot();
+        }
+    }
+#endif
+    PROCESS_END();
 }
 
 void mphal_init(void) {
@@ -65,13 +89,8 @@ void mphal_init(void) {
 
 int mp_hal_stdin_rx_chr(void) {
     int c = 0;
-    for (;;) {
-        c = ringbuf_get(&input_buf);
-        if (c != -1) {
-            return c;
-        }
-        ssv_delay(1000);
-    }
+    c = ringbuf_get(&input_buf);
+    return c;
 }
 
 void mp_hal_stdout_tx_char(char c) {
@@ -119,5 +138,4 @@ void mp_hal_delay_ms(uint32_t delay) {
 
 void mp_hal_delay_us(uint32_t us) {
     //TODO(May not precise)
-    ssv_delay(1000 * 1300);
 }

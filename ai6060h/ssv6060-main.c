@@ -116,23 +116,29 @@ PROCESS_NAME(temperature_compensator_process);
 PROCESS_NAME(tcp_driver_process);
 PROCESS_NAME(udp_driver_process);
 PROCESS_NAME(dhcp_process);
+PROCESS_NAME(watchdog_process);
 PROCESS_NAME(resolv_process);
 PROCESS_NAME(discover_process);
+
+PROCESS_NAME(os_repl_process);
 
 PROCESS(main_process, "main process");
 AUTOSTART_PROCESSES(&main_process);
 PROCESS_THREAD(main_process, ev, data)
 {
     PROCESS_BEGIN();
-
+#if !MICROPY_REPL_EVENT_DRIVEN
     if(pyexec_friendly_repl() != 0) {
         api_wdog_reboot();
     }
+#endif
     PROCESS_END();
 }
 
+extern IEEE80211STATUS          gwifistatus;
+extern TAG_CABRIO_CONFIGURATION gCabrioConf;
+
 int mp_main (void) {
-    //set_log_single_group_level(11,1,2);
     memcpy(&i_config, 0x3003000, sizeof(COMMON_CONFIG));
     bsp_init();
     clock_init();
@@ -141,6 +147,7 @@ int mp_main (void) {
     // Due to console_init would register a callback to icomlib tx handler which is not what I want, so I do the console_init in mphal_init
     //console_init(NULL);
     mphal_init();
+    //set_log_single_group_level(7, 1, 2);
     cabrio_flash_init();
     reset_global_conf();
     bsp_get_boot_info(true);
@@ -155,14 +162,9 @@ int mp_main (void) {
     mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR_));
     mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR__slash_flash));
     mp_obj_list_append(mp_sys_path, MP_OBJ_NEW_QSTR(MP_QSTR__slash_flash_slash_lib));
-
-    //irq_init();
-
-    //hwtmr_init();
     readline_init0();
     mp_hal_stdout_tx_strn_cooked(msg_0, strlen(msg_0));
     flash_vfs_init0();
-
     process_init();
     process_start(&etimer_process, NULL);
     init_global_conf();
@@ -172,17 +174,24 @@ int mp_main (void) {
     process_start(&udp_driver_process, NULL);
     irq_enable();
     netstack_init();
+    //process_start(&watchdog_process, NULL);
     process_start(&dhcp_process, NULL);
     process_start(&temperature_compensator_process, NULL);
-    autostart_start(autostart_processes);
+    //at_cmd_start();
+
     process_start(&resolv_process, NULL);
     process_start(&discover_process, NULL);
+#if MICROPY_REPL_EVENT_DRIVEN
+    pyexec_event_repl_init();
+    process_start(&os_repl_process, NULL);
+#else
+    autostart_start(autostart_processes);
+#endif
     for(;;) {
         do {
         } while (process_run() > 0);
     }
     return 0;
-
 }
 
 mp_import_stat_t mp_import_stat(const char *path) {

@@ -17,6 +17,7 @@ CONTIKI_SRC += $(CONTIKI_PROJECT).c \
 			   wdt.c \
 			   timer.c \
 			   pin.c \
+			   dummy.c \
 			   modutime.c \
 			   moduos.c \
 			   modumachine.c \
@@ -37,7 +38,6 @@ OBJ=$(PY_O) $(patsubst %.c,$(BUILD)/%.o,$(CONTIKI_SRC)) $(patsubst %.c,$(BUILD)/
 TARGET=cabrio
 CRT0 = boot.s
 FLASH_LAYOUT=flash_layout_boot_8k
-ADD_LIB=-L ./thirdPartyLib -lairkiss
 
 CROSS_COMPILE ?= arm-none-eabi-
 CROSS ?= $(CROSS_COMPILE)
@@ -140,6 +140,6 @@ print:
 ssv6060-main.elf: $(OBJ) icomlib/icomlib.a $(LINKERSCRIPT)
 	$(Q)$(CC) $(LDFLAGS) $(CFLAGS) $(filter-out %.a %.lds,$^) $(filter %.a,$^) -lc $(filter %.a,$^) -lm -o $@ $(ADD_LIB)
 	$(Q)$(CP) icomlib/icomlib.a . ### use cp to copy library or the linker script will have problem for hierachy issue ###
-	$(Q)$(CC) $(LDFLAGS) $(CFLAGS) $(OBJ) icomlib.a icomlib.a -o ssv6060-main.elf -L ./thirdPartyLib -lairkiss -lm
+	$(Q)$(CC) $(LDFLAGS) $(CFLAGS) $(OBJ) icomlib.a icomlib.a -o ssv6060-main.elf -lm
 
 include ../py/mkrules.mk

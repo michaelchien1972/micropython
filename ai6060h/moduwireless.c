@@ -41,8 +41,17 @@ STATIC wlan_obj_t wlan_obj = {
     {{&wlan_type}}
 };
 
+STATIC mp_obj_t wlan_start_ap(mp_obj_t self_in) {
+    wlan_obj_t *self = self_in;
+    softap_init();
+    softap_start();
+    return mp_const_none;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_1(wlan_start_ap_obj, wlan_start_ap);
+
 STATIC const mp_map_elem_t wlan_locals_table[] = {
     { MP_OBJ_NEW_QSTR(MP_QSTR___name__),   MP_OBJ_NEW_QSTR(MP_QSTR_wlan) },
+    { MP_OBJ_NEW_QSTR(MP_QSTR_start_ap),   (mp_obj_t)&wlan_start_ap_obj },
 };
 STATIC MP_DEFINE_CONST_DICT(wlan_locals_dict, wlan_locals_table);
 

@@ -39,7 +39,7 @@
 
 #elif (MODULE_ID==MODULE_HIFLYING)
 
-#define CFG_FLASH_SIZE  (2048 * KB)
+#define CFG_FLASH_SIZE  (512 * KB)
 #define CFG_BOOT_SECTOR_SIZE      (8 * KB)		//IOT coffee file system size(unit:KB)
 #define CFG_MP_SIZE      (4 * KB)		//IOT coffee file system size(unit:KB)
 #define CFG_CONFIG_SIZE      (4 * KB)		//IOT coffee file system size(unit:KB)

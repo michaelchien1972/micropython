@@ -13,6 +13,7 @@
 #define MICROPY_MODULE_WEAK_LINKS           (1)
 #define MICROPY_ENABLE_GC                   (1)
 #define MICROPY_HELPER_REPL                 (1)
+#define MICROPY_REPL_EVENT_DRIVEN           (1)
 #define MICROPY_ENABLE_COMPILER             (1)
 #define MICROPY_ENABLE_FINALISER            (0)
 #define MICROPY_ENABLE_SOURCE_LINE          (1)
@@ -95,6 +96,7 @@ extern const struct _mp_obj_module_t mp_module_uwireless;
 #define MICROPY_PORT_ROOT_POINTERS                                        \
     const char *readline_hist[8];                                         \
     mp_obj_t mp_const_user_interrupt;   \
+    vstr_t *repl_line; \
 
 // We need to provide a declaration/definition of alloca()
 #include <alloca.h>
