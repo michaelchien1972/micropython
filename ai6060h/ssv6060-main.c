@@ -176,7 +176,7 @@ int mp_main (void) {
     netstack_init();
     //process_start(&watchdog_process, NULL);
     process_start(&dhcp_process, NULL);
-    process_start(&temperature_compensator_process, NULL);
+    //process_start(&temperature_compensator_process, NULL);
     //at_cmd_start();
 
     process_start(&resolv_process, NULL);

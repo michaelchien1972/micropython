@@ -304,7 +304,7 @@ void dhcp_dump_info()
     U8 *p_mac = NULL;
     U8 *p_ip = NULL;
 
-    printf("<%s>%d,config->num_leases=%d\n",__func__,__LINE__,config->num_leases);
+    icomprintf(GROUP_SOFTAP, LOG_INFO, "<%s>%d,config->num_leases=%d\n",__func__,__LINE__,config->num_leases);
     
     while(lease != end) 
     {
@@ -314,7 +314,7 @@ void dhcp_dump_info()
         //printf("flags=%d\n",lease->flags);
         p_mac = &(lease->chaddr[0]);
         p_ip = &(lease->ipaddr.u8[0]);
-        printf("<dhcp-%d> mac:%x-%x-%x-%x-%x-%x, ip:%d.%d.%d.%d, flags=%d,lease=0x%x\n", loop_i,p_mac[0],p_mac[1],p_mac[2],p_mac[3],p_mac[4],p_mac[5]
+        icomprintf(GROUP_SOFTAP, LOG_INFO, "<dhcp-%d> mac:%x-%x-%x-%x-%x-%x, ip:%d.%d.%d.%d, flags=%d,lease=0x%x\n", loop_i,p_mac[0],p_mac[1],p_mac[2],p_mac[3],p_mac[4],p_mac[5]
                                                                                                                     ,p_ip[0],p_ip[1],p_ip[2],p_ip[3],lease->flags,lease);
         
         loop_i++;
@@ -505,7 +505,7 @@ S32 release_address_by_mac(U8 *p_mac)
     
     lease = get_leased_mac(p_mac, ETH_ALEN);
 
-    printf("release_address_by_mac  mac=%x:%x:%x:%x:%x:%x lease=0x%x\n",p_mac[0],p_mac[1],p_mac[2],p_mac[3],p_mac[4],p_mac[5],lease);
+    icomprintf(GROUP_SOFTAP, LOG_INFO, "release_address_by_mac  mac=%x:%x:%x:%x:%x:%x lease=0x%x\n",p_mac[0],p_mac[1],p_mac[2],p_mac[3],p_mac[4],p_mac[5],lease);
     
     
     if (!lease) {

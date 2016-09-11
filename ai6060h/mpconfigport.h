@@ -30,6 +30,7 @@
 #define MICROPY_PY_BUILTINS_PROPERTY        (1)
 #define MICROPY_PY___FILE__                 (1)
 
+#define MICROPY_USE_INTERNAL_PRINTF         (0)
 #define MICROPY_PY_GC                       (1)
 #define MICROPY_PY_ARRAY                    (0)
 #define MICROPY_PY_ATTRTUPLE                (1)
