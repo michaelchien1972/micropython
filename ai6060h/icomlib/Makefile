@@ -36,7 +36,7 @@ platform/bsp_info.c \
 platform/cfs-coffee.c \
 platform/clock.c \
 platform/console.c \
-platform/contiki-main.c \
+#platform/contiki-main.c \
 platform/debug-uart.c \
 platform/drv_fence.c \
 platform/drv_flash.c \

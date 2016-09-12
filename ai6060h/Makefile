@@ -11,7 +11,7 @@ include Makefile.mk
 
 MAC_BIN = ssv6060_mac.hex
 CONTIKI_PROJECT=ssv6060-main
-CONTIKI_SRC += $(CONTIKI_PROJECT).c \
+CONTIKI_SRC += main.c \
 			   mphal.c \
 			   flash.c \
 			   wdt.c \
