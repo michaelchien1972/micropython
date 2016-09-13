@@ -54,35 +54,16 @@ irq_handler rx_irq_handler(void *arg) {
     else
         ringbuf_put(&input_buf, c);
 
-}
-
-PROCESS(os_repl_process, "repl");
-PROCESS_THREAD(os_repl_process, ev, data)
-{
-    PROCESS_BEGIN();
-#if MICROPY_REPL_EVENT_DRIVEN
-    int c, ret;
-    for (;;) {
-        PROCESS_PAUSE();
-        c = ringbuf_get(&input_buf);
-        if (c == interrupt_char) {
-            //TODO(not support yet)
-            //mp_keyboard_interrupt();
-        }
-        ret = pyexec_event_repl_process_char(c);
-        if (ret & PYEXEC_FORCED_EXIT) {
-            api_wdog_reboot();
-        }
-    }
-#endif
-    PROCESS_END();
+    ssv_delay(10);
 }
 
 void mphal_init(void) {
     drv_uart_init(AI6060H_CONSOLE_UART_PORT);
 
     // Need to this function to calibrate clock..
-    drv_uart_40M();
+    drv_uart_26M();
+
+    drv_uart_enable_rx_int_0();
 
     irq_request(IRQ_UART0_RX, rx_irq_handler, NULL);
 }
@@ -124,12 +105,12 @@ void mp_hal_stdout_tx_strn_cooked(const char *str, uint32_t len) {
 
 uint32_t mp_hal_ticks_ms(void) {
     //TODO(It might not precise)
-    return clock_time();
+    return 0;
 }
 
 uint32_t mp_hal_ticks_us(void) {
     //TODO(It might not precise)
-    return clock_time();
+    return 0;
 }
 
 void mp_hal_delay_ms(uint32_t delay) {

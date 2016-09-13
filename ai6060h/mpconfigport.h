@@ -13,7 +13,6 @@
 #define MICROPY_MODULE_WEAK_LINKS           (1)
 #define MICROPY_ENABLE_GC                   (1)
 #define MICROPY_HELPER_REPL                 (1)
-#define MICROPY_REPL_EVENT_DRIVEN           (1)
 #define MICROPY_ENABLE_COMPILER             (1)
 #define MICROPY_ENABLE_FINALISER            (0)
 #define MICROPY_ENABLE_SOURCE_LINE          (1)

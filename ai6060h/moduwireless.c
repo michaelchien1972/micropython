@@ -43,8 +43,6 @@ STATIC wlan_obj_t wlan_obj = {
 
 STATIC mp_obj_t wlan_start_ap(mp_obj_t self_in) {
     wlan_obj_t *self = self_in;
-    softap_init();
-    softap_start();
     return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(wlan_start_ap_obj, wlan_start_ap);

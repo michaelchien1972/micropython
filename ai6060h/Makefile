@@ -10,7 +10,7 @@ include ../py/py.mk
 include Makefile.mk
 
 MAC_BIN = ssv6060_mac.hex
-CONTIKI_PROJECT=ssv6060-main
+PROJECT = firmware
 CONTIKI_SRC += main.c \
 			   mphal.c \
 			   flash.c \
@@ -30,8 +30,8 @@ CONTIKI_SRC += main.c \
 			   lib/fatfs/ff.c \
 			   lib/fatfs/option/ccsbcs.c \
 
-CONTIKI_SRC += $(wildcard contikilib/*.c) 
-CONTIKI_SRC += $(wildcard icomapps/*.c) 
+#CONTIKI_SRC += $(wildcard contikilib/*.c) 
+#CONTIKI_SRC += $(wildcard icomapps/*.c) 
 
 OBJ=$(PY_O) $(patsubst %.c,$(BUILD)/%.o,$(CONTIKI_SRC)) $(patsubst %.c,$(BUILD)/%.o,$(CONTIKI_SRS))
 
@@ -74,7 +74,7 @@ AROPTS = rcf
 SRC_QSTR += $(CONTIKI_SRC)
 SRC_QSTR_AUTO_DEPS =
 
-CLEAN += %.elf $(CONTIKI_PROJECT).elf
+CLEAN += %.elf $(PROJECT).elf
 
 ### Compilation rules
 
@@ -83,10 +83,10 @@ CLEAN += %.elf $(CONTIKI_PROJECT).elf
 
 all:
 	$(MAKE) -C icomlib
-	make ssv6060-main.bin
+	make $(PROJECT).bin
 
 #%.bin:%.elf
-ssv6060-main.bin: ssv6060-main.elf
+$(PROJECT).bin: $(PROJECT).elf
 		@echo "-----------------make 3 target:$@ 1st-dep:$< $(makefn3)-----------------"
 		@test -s $(MAC_BIN) || { printf "\n\n$(MAC_BIN)(MAC address embedded inside) does not exist or file size=0 !!!\n";echo "###Please use ./util/gen_mac_bin.exe to generate it once ###\n"; exit 1; }
 		@test `stat -c %s $(MAC_BIN)` -eq 8192 || { echo "Please generate $(MAC_BIN),and file size must be 8192(Bytes) "; exit 1; }
@@ -95,13 +95,13 @@ ssv6060-main.bin: ssv6060-main.elf
 		test `stat -c %s $@` -lt 484000	###acceptable if < 384KB### 
 		@echo "-----Done:bin file size:ok-----<<<"	
 		@echo "-----Generate bin for uart-upgrade-----"
-		dd skip=$(BOOT_CODE_AND_CONFIG_SIZE) if=$@ of=$(CONTIKI_PROJECT)_os.bin bs=1
-		dd skip=0 count=$(BOOT_CODE_SIZE) if=$(CONTIKI_PROJECT).bin of=boot_tmp.bin bs=1
-		cat boot_tmp.bin $(MAC_BIN) $(CONTIKI_PROJECT)_os.bin > $(CONTIKI_PROJECT).bin
+		dd skip=$(BOOT_CODE_AND_CONFIG_SIZE) if=$@ of=$(PROJECT)_os.bin bs=1
+		dd skip=0 count=$(BOOT_CODE_SIZE) if=$(PROJECT).bin of=boot_tmp.bin bs=1
+		cat boot_tmp.bin $(MAC_BIN) $(PROJECT)_os.bin > $(PROJECT).bin
 
-		@/bin/rm -rf boot_tmp.bin $(CONTIKI_PROJECT)_os.bin dump.log 
+		@/bin/rm -rf boot_tmp.bin $(PROJECT)_os.bin dump.log 
 
-		@arm-none-eabi-objdump -h $(CONTIKI_PROJECT).elf > dump.log 
+		@arm-none-eabi-objdump -h $(PROJECT).elf > dump.log 
 		@chmod +x ./util/*.pl; 
 		@./util/rpt_sram_usage.pl dump.log
 		@printf "\n\n"; 
@@ -116,13 +116,13 @@ ssv6060-main.bin: ssv6060-main.elf
 		@echo "-----------------make z0 target:$@ $(makefn3)-----------------"
 		$(Q)$(CC) $(CFLAGS) $< -c
 asm:
-	$(OBJDUMP) -D -S ssv6060-main.elf > ssv6060-main.asm
+	$(OBJDUMP) -D -S $(PROJECT).elf > $(PROJECT).asm
 
 layout:
 		@cd ./util; make $(FLASH_LAYOUT); 
 
 chksum:
-		@../util/gen_checksum $(MODULE_ID) $(join $(CONTIKI_PROJECT), .bin); 
+		@../util/gen_checksum $(MODULE_ID) $(join $(PROJECT), .bin); 
 chk:
 		@./util/chk_code_size.pl contiki-cabrio.map
 sramf:
@@ -137,9 +137,9 @@ warn:
 print:
 		echo $(OBJ)
 
-ssv6060-main.elf: $(OBJ) icomlib/icomlib.a $(LINKERSCRIPT)
+$(PROJECT).elf: $(OBJ) icomlib/icomlib.a $(LINKERSCRIPT)
 	$(Q)$(CC) $(LDFLAGS) $(CFLAGS) $(filter-out %.a %.lds,$^) $(filter %.a,$^) -lc $(filter %.a,$^) -lm -o $@ $(ADD_LIB)
 	$(Q)$(CP) icomlib/icomlib.a . ### use cp to copy library or the linker script will have problem for hierachy issue ###
-	$(Q)$(CC) $(LDFLAGS) $(CFLAGS) $(OBJ) icomlib.a icomlib.a -o ssv6060-main.elf -lm
+	$(Q)$(CC) $(LDFLAGS) $(CFLAGS) $(OBJ) icomlib.a icomlib.a -o $(PROJECT).elf -lm
 
 include ../py/mkrules.mk

@@ -12,10 +12,10 @@
 
 extern const struct _mp_obj_type_t flash_type;
 
-#define FLASH_START_BASE    (0x72000)
+#define FLASH_START_BASE    (0x40000)
 #define FLASH_BLOCK_SIZE    (4096)
 #define FLASH_START_BLOCK   (0)
-#define FLASH_NUM_BLOCKS    (62)
+#define FLASH_NUM_BLOCKS    (64)
 
 void flash_init0(fs_user_mount_t *vfs);
 

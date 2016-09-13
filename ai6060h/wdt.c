@@ -41,7 +41,7 @@ STATIC mp_obj_t wdt_start(mp_obj_t self_in, mp_obj_t msec_in) {
     wdt_obj_t *self = self_in;
     mp_int_t msec = mp_obj_get_int(msec_in);
     if (msec > 0) {
-        api_wdog_period_cutommed(msec);
+        drv_wdog_period_cutommed(msec);
         self->msec = msec;
     } else {
         nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError, "millisecond must > 0"));
@@ -51,14 +51,14 @@ STATIC mp_obj_t wdt_start(mp_obj_t self_in, mp_obj_t msec_in) {
 STATIC MP_DEFINE_CONST_FUN_OBJ_2(wdt_start_obj, wdt_start);
 
 STATIC mp_obj_t wdt_stop(mp_obj_t self_in) {
-    api_wdog_stop();
+    drv_wdog_stop();
     return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(wdt_stop_obj, wdt_stop);
 
 STATIC mp_obj_t wdt_refresh(mp_obj_t self_in) {
     wdt_obj_t *self = self_in;
-    api_wdog_period_cutommed(self->msec);
+    drv_wdog_period_cutommed(self->msec);
     return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(wdt_refresh_obj, wdt_refresh);

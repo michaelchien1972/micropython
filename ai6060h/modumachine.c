@@ -41,7 +41,7 @@
 #include "irq.h"
 
 STATIC mp_obj_t machine_reset(void) {
-    api_wdog_reboot();
+    drv_wdog_reboot();
     return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_0(machine_reset_obj, machine_reset);

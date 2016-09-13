@@ -30,7 +30,7 @@
 #include "py/runtime.h"
 #include "py/mphal.h"
 
-#include "wdog_api.h"
+#include "drv_wdog.h"
 
 extern const mp_obj_type_t wdt_type;
 
