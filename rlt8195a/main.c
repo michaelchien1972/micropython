@@ -53,7 +53,8 @@
 
 #include "gpio_irq_api.h"
 
-#include <mDNS/mDNS.h>
+//#include <mDNS/mDNS.h>
+#include <mdns/mDNS.h> 
 
 /*****************************************************************************
  *                              Internal variables
