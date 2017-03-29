@@ -1,7 +1,8 @@
 #include "py/obj.h"
 #include "cmsis_os.h"
 #include "osdep_api.h"
-#include <mDNS/mDNS.h>
+//#include <mDNS/mDNS.h>
+#include <mdns/mDNS.h>
 
 osThreadId mdns_tid;
 
