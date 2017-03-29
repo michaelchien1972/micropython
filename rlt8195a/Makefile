@@ -140,18 +140,18 @@ ELF_LDFLAGS += -Wl,--no-enum-size-warning
 ELF_LDFLAGS += -Wl,--no-wchar-size-warning
 ELF_LDFLAGS += -Wl,--entry=InfraStart
 
-ELF_ARLIST += ./$(LIB)/lib_wlan.a
-ELF_ARLIST += ./$(LIB)/lib_wlan_mp.a 
-ELF_ARLIST += ./$(LIB)/lib_wps.a
-ELF_ARLIST += ./$(LIB)/lib_mdns.a
-ELF_ARLIST += ./$(LIB)/lib_ameba.a
-ELF_ARLIST += ./$(LIB)/lib_rtlstd.a
-ELF_ARLIST += ./$(LIB)/lib_platform.a
-ELF_ARLIST += ./$(LIB)/lib_usb_drv.a
-ELF_ARLIST += ./$(LIB)/lib_usb_otg.a
-ELF_ARLIST += ./$(LIB)/lib_uvc.a
-ELF_ARLIST += ./$(LIB)/lib_usb_otg_linux.a
-ELF_ARLIST += ./$(LIB)/lib_sdcard.a
+#ELF_ARLIST += ./$(LIB)/lib_wlan.a
+#ELF_ARLIST += ./$(LIB)/lib_wlan_mp.a 
+#ELF_ARLIST += ./$(LIB)/lib_wps.a
+#ELF_ARLIST += ./$(LIB)/lib_mdns.a
+#ELF_ARLIST += ./$(LIB)/lib_ameba.a
+#ELF_ARLIST += ./$(LIB)/lib_rtlstd.a
+#ELF_ARLIST += ./$(LIB)/lib_platform.a
+#ELF_ARLIST += ./$(LIB)/lib_usb_drv.a
+#ELF_ARLIST += ./$(LIB)/lib_usb_otg.a
+#ELF_ARLIST += ./$(LIB)/lib_uvc.a
+#ELF_ARLIST += ./$(LIB)/lib_usb_otg_linux.a
+#ELF_ARLIST += ./$(LIB)/lib_sdcard.a
 
 #-------------------------------------------------------------------------------
 # C source files and objects
